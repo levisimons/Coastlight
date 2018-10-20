@@ -1,3 +1,5 @@
+##This script counts all of the saturated pixels in the raw image files.
+##These counts are used to determine which image exposure produces the fewest saturated pixels for downstream analysis.
 library(hexView)
 library(broman)
 
