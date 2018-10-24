@@ -26,7 +26,11 @@ for(directory in directories){
     whitePixelCount <- imageHistogram[which(imageHistogram$Color=="#FFFFFF"),"Count"]
     row <- data.frame()
     row[1,1] <- gsub(".jpg",".CR2",fileName) # Replace the extension in the name, but not the actual filetype, for later analysis.
-    row[1,2] <- whitePixelCount
+    if(length(whitePixelCount)==0){
+      row[1,2] <- 0
+    } else{
+      row[1,2] <- whitePixelCount
+    }
     print(row)
     imageSaturations <- rbind(imageSaturations,row)
   }
