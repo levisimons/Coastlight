@@ -1,0 +1,17 @@
+1. To extract the raw image creation times via Mac command line use the following command:
+mdls *.CR2 | grep kMDItemFSCreationDate | awk '{print $4}'
+Paste these times into Excel.  If the times are off, for example if they are set to GMT, then they can be converted to PDT using:
+=A2 + time(N,0,0) where N is the offset in hours.
+
+
+2. To extract the exposure time from the camera in seconds use the following command:
+mdls *.CR2 | grep kMDItemExposureTimeSeconds | awk '{print $3}'
+
+3. In order to convert all of the CR2 files into jpg format, which will allow for easier basic image analysis, the following command was run in terminal on a Mac:
+for d in ./*/ ; do (cd "$d" && for i in *.CR2; do sips -s format jpeg $i --out "${i%.*}.jpg"; done); done
+This command recursively goes through all of the directories in a folder and converts the CR2 files to jpg files.
+
+4. To extract GPS coordinates from the Canon EOS 6D Mark II
+mdls *.CR2 | grep kMDItemLatitude | awk '{print $3}'
+mdls *.CR2 | grep kMDItemLongitude | awk '{print $3}'
+
