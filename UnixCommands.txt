@@ -10,6 +10,8 @@ mdls *.CR2 | grep kMDItemExposureTimeSeconds | awk '{print $3}'
 3. In order to convert all of the CR2 files into jpg format, which will allow for easier basic image analysis, the following command was run in terminal on a Mac:
 for d in ./*/ ; do (cd "$d" && for i in *.CR2; do sips -s format jpeg $i --out "${i%.*}.jpg"; done); done
 This command recursively goes through all of the directories in a folder and converts the CR2 files to jpg files.
+In a single directory the command is:
+for d in ./*/ ; do (for i in *.CR2; do sips -s format jpeg $i --out "${i%.*}.jpg"; done); done
 
 4. To extract GPS coordinates from the Canon EOS 6D Mark II
 mdls *.CR2 | grep kMDItemLatitude | awk '{print $3}'
