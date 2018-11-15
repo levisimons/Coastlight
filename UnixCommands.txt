@@ -1,5 +1,5 @@
 1. To extract the raw image creation times via Mac command line use the following command:
-mdls *.CR2 | grep kMDItemFSCreationDate | awk '{print $4}'
+mdls *.CR2 | grep kMDItemContentCreationDate | awk '{print $4}'
 Paste these times into Excel.  If the times are off, for example if they are set to GMT, then they can be converted to PDT using:
 =A2 + time(N,0,0) where N is the offset in hours.
 
