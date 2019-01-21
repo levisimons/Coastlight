@@ -27,4 +27,4 @@ LPPlotZH+xlab("SQM2015Atlas (mcd/m^2)")+ylab("Log(Scalar Illuminance (mlx)")+ggt
 
 #Plot data for horizon-edited images
 LPPlotEH <- ggplot(FieldSQCMergeEH, aes(x=`SQM2015Atlas (mcd/m^2)`,y=log(ScalarIlluminance),color=Clouds))+geom_point()+geom_smooth(method=glm, aes(fill=ScalarIlluminance))
-LPPlotEH+xlab("SQM2015Atlas (mcd/m^2)")+ylab("Log(Scalar Illuminance (mlx))")+scale_color_gradientn("% Cloud cover",colours = rainbow(5))
+LPPlotEH+xlab("SQM2015Atlas (mcd/m^2)")+ylab("Log(Scalar Illuminance (mlx))")+ggtitle("Log of Scalar Illuminance (Field data) vs. SQM Atlas (Satellite data)\nEdited Horizon")+scale_color_gradientn("% Cloud cover",colours = rainbow(5))
