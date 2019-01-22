@@ -29,17 +29,34 @@ LPPlotZH <- ggplot(FieldSQCMergeZH, aes(x=`SQM2015Atlas (mcd/m^2)`,y=log10(`Scal
 LPPlotZH+xlab("SQM2015Atlas (mcd/m^2)")+ylab("Log(Scalar Illuminance (mlx)")+ggtitle("Log of Scalar Illuminance (Field data) vs. SQM Atlas (Satellite data)\nZero Horizon")+scale_color_gradientn("% Cloud cover",colours = rainbow(5))
 
 #Plot data for horizon-edited images
-LPPlotEH <- ggplot(FieldSQCMergeEH, aes(x=`SQM2015Atlas (mcd/m^2)`,y=log10(`Scalar Illuminance`),color=Clouds))+geom_point()+geom_smooth(method=glm, aes(fill=`Scalar Illuminance`))
-LPPlotEH+xlab("SQM2015Atlas (mcd/m^2)")+ylab("Log(Scalar Illuminance (mlx))")+ggtitle("Log of Scalar Illuminance (Field data) vs. SQM Atlas (Satellite data)\nEdited Horizon")+scale_color_gradientn("% Cloud cover",colours = rainbow(5))
+LPPlotEH <- ggplot(FieldSQCMergeEH, aes(x=`SQM2015Atlas (mcd/m^2)`,y=log10(`Scalar Illuminance`),color=Horizon))+geom_point()+geom_smooth(method=glm, aes(fill=`Scalar Illuminance`))
+LPPlotEH+xlab("SQM2015Atlas (mcd/m^2)")+ylab("Log(Scalar Illuminance (mlx))")+ggtitle("Log of Scalar Illuminance (Field data) vs. SQM Atlas (Satellite data)\nEdited Horizon")+scale_color_gradientn("% Sky covered\nby horizon",colours = rainbow(5))
 
 #Fit a model to predict the log of the scalar illuminance from field data for horizon-edited images.
-LPModelEH <- glm(log10(`Scalar Illuminance`)~Temperature+Humidity+Clouds+`SQM2015Atlas (mcd/m^2)`+`Average Horizon`,data=FieldSQCMergeEH)
+LPModelEH <- glm(log10(`Scalar Illuminance`)~Temperature+Humidity+Clouds+`SQM2015Atlas (mcd/m^2)`+`Average Horizon`+SQMMean,data=FieldSQCMergeEH)
 summary(LPModelEH)
 printCoefmat(coef(summary(step(LPModelEH))))
 calc.relimp(LPModelEH)
 
 #Fit a model to predict the log of the scalar illuminance from field data for zero-horizon images.
-LPModelZH <- lm(log10(`Scalar Illuminance`)~Temperature+Humidity+Clouds+`SQM2015Atlas (mcd/m^2)`,data=FieldSQCMergeZH)
+LPModelZH <- lm(log10(`Scalar Illuminance`)~Temperature+Humidity+Clouds+`SQM2015Atlas (mcd/m^2)`+SQMMean,data=FieldSQCMergeZH)
 summary(LPModelZH)
 printCoefmat(coef(summary(step(LPModelZH))))
 calc.relimp(LPModelZH)
+
+#Subset horizon-edited data for analysis of spatial variability of scalar illuminance.
+SpatialEH <- FieldSQCMergeEH
+#UniqueID is the unique combination of 2015 sky atlas brightness with the GPS coordinates
+#of the centroid of the 2015 sky atlas pixel
+SpatialEH$UniqueID <- paste(SpatialEH$`Centroid latitude`,",",SpatialEH$`Centroid longitude`,",",SpatialEH$`SQM2015Atlas (mcd/m^2)`,sep="")
+SpatialEH <- SpatialEH[,c("UniqueID","Horizon","Scalar Illuminance","SQMMean")]
+SpatialEH <- arrange(SpatialEH,UniqueID)
+
+#Determine the mean of scalar illuminance by UniqueID
+tmp <- as.data.frame(aggregate(SpatialEH$`Scalar Illuminance`,by=list(SpatialEH$UniqueID),FUN=mean))
+colnames(tmp) <- c("UniqueID","ScalarIlluminanceMean")
+SpatialEH <- merge(SpatialEH,tmp,by=c("UniqueID"))
+#Determine the coefficient of variation of scalar illuminance by UniqueID
+tmp <- as.data.frame(aggregate(SpatialEH$`Scalar Illuminance`,by=list(SpatialEH$UniqueID),FUN=function(ScalarIlluminance){sd(ScalarIlluminance)/mean(ScalarIlluminance)}))
+colnames(tmp) <- c("UniqueID","ScalarIlluminanceCoV")
+SpatialEH <- merge(SpatialEH,tmp,by=c("UniqueID"))
