@@ -1,6 +1,7 @@
 #Quick script for plotting variance measures of sky brightness for poster.
 require(dplyr)
 require(ggplot2)
+require(relaimpo)
 
 wd <- "~/Desktop/Coastlight"
 setwd(wd)
@@ -11,20 +12,34 @@ SQCData <- read.table("CoastlightPosterData.csv", header=TRUE, sep=",",as.is=T,s
 FieldData <- read.table("CoastlightFieldData.csv", header=TRUE, sep=",",as.is=T,skip=0,fill=TRUE,check.names=FALSE)
 
 #Keep batch analysis data for images with zero horizon.
-SQCDataZeroHorizon <- SQCData[!grepl("Horizon",SQCData$SQCFileName),]
+SQCDataZeroHorizon <- SQCData[!grepl("Horizon",SQCData$'SQC File Name'),]
 
 #Keep batch analysis data for images with edited horizon.
-SQCDataEditedHorizon <- SQCData[grepl("Horizon",SQCData$SQCFileName),]
+SQCDataEditedHorizon <- SQCData[grepl("Horizon",SQCData$'SQC File Name'),]
 
 #Zero-horizon merged data set
 FieldSQCMergeZH <- merge(FieldData,SQCDataZeroHorizon,by.x=c("SQCSiteName"),by.y=c("Location"))
 #Edited-horizon merged data set
 FieldSQCMergeEH <- merge(FieldData,SQCDataEditedHorizon,by.x=c("SQCSiteName"),by.y=c("Location"))
+#Full merged data set
+FieldSQCMerge <- rbind(FieldSQCMergeZH,FieldSQCMergeEH)
 
 #Plot data for zero-horizon images
-LPPlotZH <- ggplot(FieldSQCMergeZH, aes(x=`SQM2015Atlas (mcd/m^2)`,y=log(ScalarIlluminance),color=Clouds))+geom_point()+geom_smooth(method=glm, aes(fill=ScalarIlluminance))
+LPPlotZH <- ggplot(FieldSQCMergeZH, aes(x=`SQM2015Atlas (mcd/m^2)`,y=log10(`Scalar Illuminance`),color=Clouds))+geom_point()+geom_smooth(method=glm, aes(fill=`Scalar Illuminance`))
 LPPlotZH+xlab("SQM2015Atlas (mcd/m^2)")+ylab("Log(Scalar Illuminance (mlx)")+ggtitle("Log of Scalar Illuminance (Field data) vs. SQM Atlas (Satellite data)\nZero Horizon")+scale_color_gradientn("% Cloud cover",colours = rainbow(5))
 
 #Plot data for horizon-edited images
-LPPlotEH <- ggplot(FieldSQCMergeEH, aes(x=`SQM2015Atlas (mcd/m^2)`,y=log(ScalarIlluminance),color=Clouds))+geom_point()+geom_smooth(method=glm, aes(fill=ScalarIlluminance))
+LPPlotEH <- ggplot(FieldSQCMergeEH, aes(x=`SQM2015Atlas (mcd/m^2)`,y=log10(`Scalar Illuminance`),color=Clouds))+geom_point()+geom_smooth(method=glm, aes(fill=`Scalar Illuminance`))
 LPPlotEH+xlab("SQM2015Atlas (mcd/m^2)")+ylab("Log(Scalar Illuminance (mlx))")+ggtitle("Log of Scalar Illuminance (Field data) vs. SQM Atlas (Satellite data)\nEdited Horizon")+scale_color_gradientn("% Cloud cover",colours = rainbow(5))
+
+#Fit a model to predict the log of the scalar illuminance from field data for horizon-edited images.
+LPModelEH <- glm(log10(`Scalar Illuminance`)~Temperature+Humidity+Clouds+`SQM2015Atlas (mcd/m^2)`+`Average Horizon`,data=FieldSQCMergeEH)
+summary(LPModelEH)
+printCoefmat(coef(summary(step(LPModelEH))))
+calc.relimp(LPModelEH)
+
+#Fit a model to predict the log of the scalar illuminance from field data for zero-horizon images.
+LPModelZH <- lm(log10(`Scalar Illuminance`)~Temperature+Humidity+Clouds+`SQM2015Atlas (mcd/m^2)`,data=FieldSQCMergeZH)
+summary(LPModelZH)
+printCoefmat(coef(summary(step(LPModelZH))))
+calc.relimp(LPModelZH)
