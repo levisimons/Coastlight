@@ -4,6 +4,9 @@ require(plyr)
 require(ggplot2)
 require(relaimpo)
 require(matrixStats)
+require(Hmisc)
+require(corrplot)
+require("PerformanceAnalytics")
 
 wd <- "~/Desktop/Coastlight"
 setwd(wd)
@@ -48,18 +51,26 @@ SQCDataEditedHorizon <- arrange(SQCDataEditedHorizon,`SQC File Name`)
 FieldSQCMergeZH <- left_join(FieldData,SQCDataZeroHorizon,by=c("SQCSiteName"="Location"))
 #Edited-horizon merged data set
 FieldSQCMergeEH <- left_join(FieldData,SQCDataEditedHorizon,by=c("SQCSiteName"="Location"))
+#Determine the fraction of horizon radiance to full sky radiance.
+FieldSQCMergeZH$HorizonLuminanceFraction <- (FieldSQCMergeZH$`Scalar Illuminance` - FieldSQCMergeEH$`Scalar Illuminance`) / FieldSQCMergeZH$`Scalar Illuminance`
+FieldSQCMergeEH$HorizonLuminanceFraction <- (FieldSQCMergeZH$`Scalar Illuminance` - FieldSQCMergeEH$`Scalar Illuminance`) / FieldSQCMergeZH$`Scalar Illuminance`
 #Full merged data set
 FieldSQCMerge <- rbind(FieldSQCMergeZH,FieldSQCMergeEH)
 #write.table(FieldSQCMerge,"CoastlightMerged94Sites.tsv",quote=FALSE,sep="\t",row.names = FALSE)
 
-
 #Plot data for zero-horizon images
 LPPlotZH <- ggplot(FieldSQCMergeZH, aes(x=`Brightness (nW/Sr/cm^2)`,y=log10(`Scalar Illuminance`),color=Clouds))+geom_point()+geom_smooth(method=glm, aes(fill=`Scalar Illuminance`))
 LPPlotZH+xlab("VIIRS Upwards Radiance (nW/Sr/cm^2)")+ylab("Log(Scalar Illuminance (mlx)")+ggtitle("Log of Scalar Illuminance (Field data) vs. VIIRS Upwards Radiance (nW/Sr/cm^2)\nZero Horizon (94 Sites)")+scale_color_gradientn("% Cloud cover",colours = rainbow(5))
+#
+SQMPlotZH <- ggplot(FieldSQCMergeZH, aes(x=`Brightness (nW/Sr/cm^2)`,y=SQMMean,color=Clouds))+geom_point()+geom_smooth(method=glm, aes(fill=SQMMean))
+SQMPlotZH+xlab("VIIRS Upwards Radiance (nW/Sr/cm^2)")+ylab("Mean SQM (mag, Field data)")+ggtitle("Mean SQM (mag, Field data) vs. VIIRS Upwards Radiance (nW/Sr/cm^2)\nZero Horizon (94 Sites)")+scale_color_gradientn("% Cloud cover",colours = rainbow(5))
 
 #Plot data for horizon-edited images
 LPPlotEH <- ggplot(FieldSQCMergeEH, aes(x=`Brightness (nW/Sr/cm^2)`,y=log10(`Scalar Illuminance`),color=Clouds))+geom_point()+geom_smooth(method=glm, aes(fill=`Scalar Illuminance`))
 LPPlotEH+xlab("VIIRS Upwards Radiance (nW/Sr/cm^2)")+ylab("Log(Scalar Illuminance (mlx))")+ggtitle("Log of Scalar Illuminance (Field data) vs. SQM Atlas (Satellite data)\nEdited Horizon (94 Sites)")+scale_color_gradientn("% Cloud cover",colours = rainbow(5))
+#
+SQMPlotEH <- ggplot(FieldSQCMergeEH, aes(x=`Brightness (nW/Sr/cm^2)`,y=SQMMean,color=Clouds))+geom_point()+geom_smooth(method=glm, aes(fill=SQMMean))
+SQMPlotEH+xlab("VIIRS Upwards Radiance (nW/Sr/cm^2)")+ylab("Mean SQM (mag, Field data)")+ggtitle("Mean SQM (mag, Field data) vs. VIIRS Upwards Radiance (nW/Sr/cm^2)\nZero Horizon (94 Sites)")+scale_color_gradientn("% Cloud cover",colours = rainbow(5))
 
 #Fit a model to predict the log of the scalar illuminance from field data for horizon-edited images.
 LPModelEH <- lm(log10(`Scalar Illuminance`)~Horizon+Clouds+`SQM2015Atlas (mcd/m^2)`+`Brightness (nW/Sr/cm^2)`,data=FieldSQCMergeEH)
@@ -72,6 +83,11 @@ LPModelZH <- lm(log10(`Scalar Illuminance`)~Horizon+Clouds+`SQM2015Atlas (mcd/m^
 summary(LPModelZH)
 printCoefmat(coef(summary(step(LPModelZH))))
 calc.relimp(LPModelZH)
+
+##Correlations of variance light pollution variables.
+#Each significance level is associated to a symbol : p-values(0, 0.001, 0.01, 0.05, 0.1, 1) <=> symbols(“***”, “**”, “*”, “.”, " “)
+chart.Correlation(FieldSQCMergeZH[,c("Scalar Illuminance","SDLuminance","SQM2015Atlas (mcd/m^2)","Brightness (nW/Sr/cm^2)","Clouds","Horizon","HorizonLuminanceFraction")], histogram=FALSE, method="spearman")
+chart.Correlation(FieldSQCMergeEH[,c("Scalar Illuminance","SDLuminance","SQM2015Atlas (mcd/m^2)","Brightness (nW/Sr/cm^2)","Clouds","Horizon","HorizonLuminanceFraction")], histogram=FALSE, method="spearman")
 
 #Subset horizon-edited data for analysis of spatial variability of scalar illuminance.
 SpatialEH <- FieldSQCMergeEH
