@@ -66,8 +66,8 @@ FieldSQCMergeEH$HorizonLuminanceFraction <- (FieldSQCMergeZH$`Scalar Illuminance
 FieldSQCMerge <- rbind(FieldSQCMergeZH,FieldSQCMergeEH)
 
 #If one wants to filter out rows with negative mean luminance values:
-FieldSQCFilteredEH <-  subset(FieldSQCMergeEH,FieldSQCMergeEH$MeanLuminance>0)
-FieldSQCFilteredZH <-  subset(FieldSQCMergeZH,FieldSQCMergeZH$MeanLuminance>0)
+#FieldSQCFilteredEH <-  subset(FieldSQCMergeEH,FieldSQCMergeEH$MeanLuminance>0)
+#FieldSQCFilteredZH <-  subset(FieldSQCMergeZH,FieldSQCMergeZH$MeanLuminance>0)
 
 #Plot data for zero-horizon images
 LPPlotZH <- ggplot(FieldSQCMergeZH, aes(x=`Brightness (nW/Sr/cm^2)`,y=log10(`Scalar Illuminance`),color=Clouds))+geom_point()+geom_smooth(method=glm, aes(fill=`Scalar Illuminance`))
@@ -125,10 +125,15 @@ colnames(tmp) <- c("UniqueID","ScalarIlluminanceCoV")
 SpatialEH <- merge(SpatialEH,tmp,by=c("UniqueID"))
 
 #To map various measures of coastal light pollution.
-MapCoordinates <- FieldSQCFilteredEH
+MapCoordinates <- FieldSQCMerge
+colnames(MapCoordinates)[which(names(MapCoordinates) == "Latitude")] <- "SQCLatitude"
+colnames(MapCoordinates)[which(names(MapCoordinates) == "Longitude")] <- "SQCLongitude"
+colnames(MapCoordinates)[which(names(MapCoordinates) == "Adjusted latitude")] <- "latitude"
+colnames(MapCoordinates)[which(names(MapCoordinates) == "Adjusted longitude")] <- "longitude"
+MapCoordinates <- MapCoordinates[!is.na(MapCoordinates$latitude) & !is.na(MapCoordinates$longitude),]
 CalMap = leaflet(MapCoordinates) %>% 
   addTiles()
 ColorScale <- colorNumeric(palette=rainbow(10),domain=log10(MapCoordinates$`Scalar Illuminance`))
 CalMap %>% addCircleMarkers(color = ~ColorScale(log10(`Scalar Illuminance`)), fill = TRUE,radius=0.1,fillOpacity = 0.1) %>% 
   addProviderTiles(providers$Esri.WorldTopoMap) %>%
-  leaflet::addLegend(position="topright", pal=ColorScale,values=~log10(`Scalar Illuminance`),title="Log(Scalar Illuminance (mcd/m^2))")
+  leaflet::addLegend(position="topright", pal=ColorScale,values=~log10(`Scalar Illuminance`),title="Log(Scalar Illuminance (mcd/m^2)")
