@@ -26,6 +26,7 @@ SQCData <- arrange(SQCData,`SQC File Name`)
 #Calculate whole sky coefficient of variation in scalar illuminance
 SkySectors <- (SQCData[grepl("D(.*?)R(.*?)Luminance", names(SQCData))])
 SectorNames <- colnames(SkySectors)
+SkySectors[SkySectors<0] <- NA
 SkySectors<-transform(as.matrix(SkySectors),SDLuminance=rowSds(as.matrix(SkySectors),na.rm=TRUE)) 
 SkySectors$MeanLuminance <- rowMeans(SkySectors[SectorNames],na.rm=TRUE)
 SkySectors$CoVLuminance <- SkySectors$SDLuminance/SkySectors$MeanLuminance
@@ -44,8 +45,12 @@ FieldData[,'Centroid latitude'] = round(FieldData[,'Centroid latitude'],5)
 FieldData[,'Centroid longitude'] = round(FieldData[,'Centroid longitude'],5)
 
 #Merge in VIIRS data by pixel to field data.
-FieldData <- left_join(FieldData,VIIRS[,c("Latitude","Longitude","Brightness (nW/Sr/cm^2)")],by=c("Centroid latitude" = "Latitude","Centroid longitude" = "Longitude"))
+FieldData <- left_join(FieldData,VIIRS[,c("Latitude","Longitude","Brightness (nW/Sr/cm^2)","OBJECTID")],by=c("Centroid latitude" = "Latitude","Centroid longitude" = "Longitude"))
 #write.table(FieldData,"CoastligthFieldData.tsv",quote=FALSE,sep="\t",row.names = FALSE)
+
+#Create unique site ID.  Each site contains 5 locations.
+colnames(FieldData)[which(names(FieldData) == "OBJECTID")] <- "UniqueID"
+FieldData$UniqueID <- as.factor(as.character(FieldData$UniqueID))
 
 #Keep batch analysis data for images with zero horizon.
 SQCDataZeroHorizon <- SQCData[!grepl("Horizon",SQCData$'SQC File Name'),]
@@ -62,12 +67,41 @@ FieldSQCMergeEH <- left_join(FieldData,SQCDataEditedHorizon,by=c("SQCSiteName"="
 #Determine the fraction of horizon radiance to full sky radiance.
 FieldSQCMergeZH$HorizonLuminanceFraction <- (FieldSQCMergeZH$`Scalar Illuminance` - FieldSQCMergeEH$`Scalar Illuminance`) / FieldSQCMergeZH$`Scalar Illuminance`
 FieldSQCMergeEH$HorizonLuminanceFraction <- (FieldSQCMergeZH$`Scalar Illuminance` - FieldSQCMergeEH$`Scalar Illuminance`) / FieldSQCMergeZH$`Scalar Illuminance`
-#Full merged data set
-FieldSQCMerge <- rbind(FieldSQCMergeZH,FieldSQCMergeEH)
 
-#If one wants to filter out rows with negative mean luminance values:
-#FieldSQCFilteredEH <-  subset(FieldSQCMergeEH,FieldSQCMergeEH$MeanLuminance>0)
-#FieldSQCFilteredZH <-  subset(FieldSQCMergeZH,FieldSQCMergeZH$MeanLuminance>0)
+#Subset horizon-edited data for analysis of spatial variability of scalar illuminance.
+SpatialEH <- FieldSQCMergeEH
+SpatialEH <- SpatialEH[,c("UniqueID","Scalar Illuminance")]
+SpatialEH <- arrange(SpatialEH,UniqueID)
+#Determine the mean of scalar illuminance by UniqueID
+tmp <- as.data.frame(aggregate(SpatialEH$`Scalar Illuminance`,by=list(SpatialEH$UniqueID),FUN=mean))
+colnames(tmp) <- c("UniqueID","ScalarIlluminanceSiteMean")
+SpatialEH <- merge(SpatialEH,tmp,by=c("UniqueID"))
+#Determine the coefficient of variation of scalar illuminance by UniqueID
+tmp <- as.data.frame(aggregate(SpatialEH$`Scalar Illuminance`,by=list(SpatialEH$UniqueID),FUN=function(ScalarIlluminance){sd(ScalarIlluminance)/mean(ScalarIlluminance)}))
+colnames(tmp) <- c("UniqueID","ScalarIlluminanceSiteCoV")
+SpatialEH <- merge(SpatialEH,tmp,by=c("UniqueID"))
+#Merge into larger data set.
+FieldSQCMergeEH <- left_join(FieldSQCMergeEH,SpatialEH,by=c("UniqueID"))
+
+#Subset zero horizon data for analysis of spatial variability of scalar illuminance.
+SpatialZH <- FieldSQCMergeZH
+SpatialZH <- SpatialZH[,c("UniqueID","Scalar Illuminance")]
+SpatialZH <- arrange(SpatialZH,UniqueID)
+#Determine the mean of scalar illuminance by UniqueID
+tmp <- as.data.frame(aggregate(SpatialZH$`Scalar Illuminance`,by=list(SpatialZH$UniqueID),FUN=mean))
+colnames(tmp) <- c("UniqueID","ScalarIlluminanceSiteMean")
+SpatialZH <- merge(SpatialZH,tmp,by=c("UniqueID"))
+#Determine the coefficient of variation of scalar illuminance by UniqueID
+tmp <- as.data.frame(aggregate(SpatialZH$`Scalar Illuminance`,by=list(SpatialZH$UniqueID),FUN=function(ScalarIlluminance){sd(ScalarIlluminance)/mean(ScalarIlluminance)}))
+colnames(tmp) <- c("UniqueID","ScalarIlluminanceSiteCoV")
+SpatialZH <- merge(SpatialZH,tmp,by=c("UniqueID"))
+#Merge into larger data set.
+FieldSQCMergeZH <- left_join(FieldSQCMergeZH,SpatialZH,by=c("UniqueID"))
+
+#Full merged data set
+FieldSQCMergeEH$TypeHorizon <- "EditedHorizon"
+FieldSQCMergeZH$TypeHorizon <- "ZeroHorizon"
+FieldSQCMerge <- rbind(FieldSQCMergeZH,FieldSQCMergeEH)
 
 #Plot data for zero-horizon images
 LPPlotZH <- ggplot(FieldSQCMergeZH, aes(x=`Brightness (nW/Sr/cm^2)`,y=log10(`Scalar Illuminance`),color=Clouds))+geom_point()+geom_smooth(method=glm, aes(fill=`Scalar Illuminance`))
@@ -80,14 +114,33 @@ SQMPlotZH <- ggplot(FieldSQCMergeZH, aes(x=`Brightness (nW/Sr/cm^2)`,y=SQMMean,c
 SQMPlotZH+xlab("VIIRS Upwards Radiance (nW/Sr/cm^2)")+ylab("Mean SQM (mag, Field data)")+ggtitle("Mean SQM (mag, Field data) vs. VIIRS Upwards Radiance (nW/Sr/cm^2)\nZero Horizon (103 Sites)")+scale_color_gradientn("% Cloud cover",colours = rainbow(5))
 
 #Plot data for horizon-edited images
-LPPlotEH <- ggplot(FieldSQCFilteredEH, aes(x=`Brightness (nW/Sr/cm^2)`,y=log10(`Scalar Illuminance`),color=Clouds))+geom_point()+geom_smooth(method=glm, aes(fill=`Scalar Illuminance`))
+LPPlotEH <- ggplot(FieldSQCMergeEH, aes(x=`Brightness (nW/Sr/cm^2)`,y=log10(`Scalar Illuminance`),color=Horizon))+geom_point()+geom_smooth(method=glm, aes(fill=`Scalar Illuminance`))
+LPPlotEH+xlab("VIIRS Upwards Radiance (nW/Sr/cm^2)")+ylab("Log(Scalar Illuminance (mlx))")+ggtitle("Log of Scalar Illuminance (Field data) vs. SQM Atlas (Satellite data)\nEdited Horizon (103 Sites)")+scale_color_gradientn("% Horizon",colours = rainbow(5))
+#
+LPPlotEH <- ggplot(FieldSQCMergeEH, aes(x=`Brightness (nW/Sr/cm^2)`,y=log10(`Scalar Illuminance`),color=Clouds))+geom_point()+geom_smooth(method=glm, aes(fill=`Scalar Illuminance`))
 LPPlotEH+xlab("VIIRS Upwards Radiance (nW/Sr/cm^2)")+ylab("Log(Scalar Illuminance (mlx))")+ggtitle("Log of Scalar Illuminance (Field data) vs. SQM Atlas (Satellite data)\nEdited Horizon (103 Sites)")+scale_color_gradientn("% Cloud cover",colours = rainbow(5))
 #
-LPPlotEH <- ggplot(FieldSQCFilteredEH, aes(x=`SQM2015Atlas (mcd/m^2)`,y=log10(`Scalar Illuminance`),color=Clouds))+geom_point()+geom_smooth(method=glm, aes(fill=`Scalar Illuminance`))
+LPPlotEH <- ggplot(FieldSQCMergeEH, aes(x=`Brightness (nW/Sr/cm^2)`,y=log10(`Scalar Illuminance`),color=CoVLuminance))+geom_point()+geom_smooth(method=glm, aes(fill=`Scalar Illuminance`))
+LPPlotEH+xlab("VIIRS Upwards Radiance (nW/Sr/cm^2)")+ylab("Log(Scalar Illuminance (mlx))")+ggtitle("Log of Scalar Illuminance (Field data) vs. SQM Atlas (Satellite data)\nEdited Horizon (103 Sites)")+scale_color_gradientn("CoV Illuminance",colours = rainbow(5))
+#
+LPPlotEH <- ggplot(FieldSQCMergeEH, aes(x=`SQM2015Atlas (mcd/m^2)`,y=log10(`Scalar Illuminance`),color=Clouds))+geom_point()+geom_smooth(method=glm, aes(fill=`Scalar Illuminance`))
 LPPlotEH+xlab("2015 Sky Atlas (mcd/m^2)")+ylab("Log(Scalar Illuminance (mlx))")+ggtitle("Log of Scalar Illuminance (Field data) vs. 2015 Sky Atlas (mcd/m^2)\nEdited Horizon (103 Sites)")+scale_color_gradientn("% Cloud cover",colours = rainbow(5))
 #
-SQMPlotEH <- ggplot(FieldSQCMergeEH, aes(x=`Brightness (nW/Sr/cm^2)`,y=SQMMean,color=Clouds))+geom_point()+geom_smooth(method=glm, aes(fill=SQMMean))
-SQMPlotEH+xlab("VIIRS Upwards Radiance (nW/Sr/cm^2)")+ylab("Mean SQM (mag, Field data)")+ggtitle("Mean SQM (mag, Field data) vs. VIIRS Upwards Radiance (nW/Sr/cm^2)\nZero Horizon (103 Sites)")+scale_color_gradientn("% Cloud cover",colours = rainbow(5))
+LPPlotEH <- ggplot(FieldSQCMergeEH, aes(x=`SQM2015Atlas (mcd/m^2)`,y=log10(`Scalar Illuminance`),color=Horizon))+geom_point()+geom_smooth(method=glm, aes(fill=`Scalar Illuminance`))
+LPPlotEH+xlab("2015 Sky Atlas (mcd/m^2)")+ylab("Log(Scalar Illuminance (mlx))")+ggtitle("Log of Scalar Illuminance (Field data) vs. 2015 Sky Atlas (mcd/m^2)\nEdited Horizon (103 Sites)")+scale_color_gradientn("% Horizon",colours = rainbow(5))
+#
+LPPlotEH <- ggplot(FieldSQCMergeEH, aes(x=`SQM2015Atlas (mcd/m^2)`,y=log10(`Scalar Illuminance`),color=CoVLuminance))+geom_point()+geom_smooth(method=glm, aes(fill=`Scalar Illuminance`))
+LPPlotEH+xlab("2015 Sky Atlas (mcd/m^2)")+ylab("Log(Scalar Illuminance (mlx))")+ggtitle("Log of Scalar Illuminance (Field data) vs. 2015 Sky Atlas (mcd/m^2)\nEdited Horizon (103 Sites)")+scale_color_gradientn("CoV Luminance",colours = rainbow(5))
+#
+LPPlotEH <- ggplot(FieldSQCMergeEH, aes(x=`SQM2015Atlas (mcd/m^2)`,y=ScalarIlluminanceSiteCoV,color=Horizon))+geom_point()+geom_smooth(method=glm, aes(fill=ScalarIlluminanceSiteCoV))
+LPPlotEH+xlab("2015 Sky Atlas (mcd/m^2)")+ylab("CoV Scalar Illuminance within sites")+ggtitle("CoV Scalar Illuminance within sites vs. 2015 Sky Atlas (mcd/m^2)\nEdited Horizon (103 Sites)")+scale_color_gradientn("% Horizon",colours = rainbow(5))
+#
+LPPlotEH <- ggplot(FieldSQCMergeEH, aes(x=`SQM2015Atlas (mcd/m^2)`,y=ScalarIlluminanceSiteCoV,color=Clouds))+geom_point()+geom_smooth(method=glm, aes(fill=ScalarIlluminanceSiteCoV))
+LPPlotEH+xlab("2015 Sky Atlas (mcd/m^2)")+ylab("CoV Scalar Illuminance within sites")+ggtitle("CoV Scalar Illuminance within sites vs. 2015 Sky Atlas (mcd/m^2)\nEdited Horizon (103 Sites)")+scale_color_gradientn("% Clouds",colours = rainbow(5))
+#
+LPPlotEH <- ggplot(FieldSQCMergeEH, aes(x=`Brightness (nW/Sr/cm^2)`,y=ScalarIlluminanceSiteCoV,color=Horizon))+geom_point()+geom_smooth(method=glm, aes(fill=ScalarIlluminanceSiteCoV))
+LPPlotEH+xlab("VIIRS Upwards Radiance (nW/Sr/cm^2)")+ylab("CoV Scalar Illuminance within sites")+ggtitle("VIIRS Upwards Radiance (nW/Sr/cm^2) vs. 2015 Sky Atlas (mcd/m^2)\nEdited Horizon (103 Sites)")+scale_color_gradientn("% Horizon",colours = rainbow(5))
+#
 
 #Fit a model to predict the log of the scalar illuminance from field data for horizon-edited images.
 LPModelEH <- lm(log10(`Scalar Illuminance`)~Horizon+Clouds+`SQM2015Atlas (mcd/m^2)`+`Brightness (nW/Sr/cm^2)`,data=FieldSQCMergeEH)
@@ -106,26 +159,8 @@ calc.relimp(LPModelZH)
 chart.Correlation(FieldSQCMergeZH[,c("Scalar Illuminance","SDLuminance","SQM2015Atlas (mcd/m^2)","Brightness (nW/Sr/cm^2)","Clouds","Horizon","HorizonLuminanceFraction")], histogram=FALSE, method="spearman")
 chart.Correlation(FieldSQCMergeEH[,c("Scalar Illuminance","SDLuminance","SQM2015Atlas (mcd/m^2)","Brightness (nW/Sr/cm^2)","Clouds","Horizon","HorizonLuminanceFraction")], histogram=FALSE, method="spearman")
 
-#Subset horizon-edited data for analysis of spatial variability of scalar illuminance.
-SpatialEH <- FieldSQCMergeEH
-#UniqueID is the unique combination of 2015 sky atlas brightness with the GPS coordinates
-#of the centroid of the 2015 sky atlas pixel
-#SQCData$UniqueID <- paste(SQCData$Latitude,",",SQCData$Longitude,",",SQCData$`SQM2015Atlas (mcd/m^2)`,sep="")
-
-SpatialEH <- SpatialEH[,c("UniqueID","Horizon","Scalar Illuminance","SQMMean")]
-SpatialEH <- arrange(SpatialEH,UniqueID)
-
-#Determine the mean of scalar illuminance by UniqueID
-tmp <- as.data.frame(aggregate(SpatialEH$`Scalar Illuminance`,by=list(SpatialEH$UniqueID),FUN=mean))
-colnames(tmp) <- c("UniqueID","ScalarIlluminanceMean")
-SpatialEH <- merge(SpatialEH,tmp,by=c("UniqueID"))
-#Determine the coefficient of variation of scalar illuminance by UniqueID
-tmp <- as.data.frame(aggregate(SpatialEH$`Scalar Illuminance`,by=list(SpatialEH$UniqueID),FUN=function(ScalarIlluminance){sd(ScalarIlluminance)/mean(ScalarIlluminance)}))
-colnames(tmp) <- c("UniqueID","ScalarIlluminanceCoV")
-SpatialEH <- merge(SpatialEH,tmp,by=c("UniqueID"))
-
 #To map various measures of coastal light pollution.
-MapCoordinates <- FieldSQCMerge
+MapCoordinates <- FieldSQCMergeEH
 colnames(MapCoordinates)[which(names(MapCoordinates) == "Latitude")] <- "SQCLatitude"
 colnames(MapCoordinates)[which(names(MapCoordinates) == "Longitude")] <- "SQCLongitude"
 colnames(MapCoordinates)[which(names(MapCoordinates) == "Adjusted latitude")] <- "latitude"
@@ -133,7 +168,7 @@ colnames(MapCoordinates)[which(names(MapCoordinates) == "Adjusted longitude")] <
 MapCoordinates <- MapCoordinates[!is.na(MapCoordinates$latitude) & !is.na(MapCoordinates$longitude),]
 CalMap = leaflet(MapCoordinates) %>% 
   addTiles()
-ColorScale <- colorNumeric(palette=rainbow(10),domain=log10(MapCoordinates$`Scalar Illuminance`))
-CalMap %>% addCircleMarkers(color = ~ColorScale(log10(`Scalar Illuminance`)), fill = TRUE,radius=0.1,fillOpacity = 0.1) %>% 
+ColorScale <- colorNumeric(palette=rainbow(10),domain=log10(MapCoordinates$`Brightness (nW/Sr/cm^2)`+0.001))
+CalMap %>% addCircleMarkers(color = ~ColorScale(log10(`Brightness (nW/Sr/cm^2)`+0.001)), fill = TRUE,radius=2,fillOpacity = 0.1) %>% 
   addProviderTiles(providers$Esri.WorldTopoMap) %>%
-  leaflet::addLegend(position="topright", pal=ColorScale,values=~log10(`Scalar Illuminance`),title="Log(Scalar Illuminance (mcd/m^2)")
+  leaflet::addLegend(position="topright", pal=ColorScale,values=~log10(`Brightness (nW/Sr/cm^2)`+0.001),title="Log VIIRS Brightness (nW/Sr/cm^2)")
