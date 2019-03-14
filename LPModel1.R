@@ -17,6 +17,7 @@ require(devtools)
 require(webshot)
 require(stats)
 require(segmented)
+require(viridis)
 
 wd <- "~/Desktop/Coastlight"
 setwd(wd)
@@ -52,7 +53,7 @@ colnames(FieldData)[which(names(FieldData) == "SQM2015Atlas (mcd/m^2)")] <- "SQA
 
 #Merge in VIIRS data by pixel to field data.
 FieldData <- left_join(FieldData,VIIRS[,c("Latitude","Longitude","VIIRSBrightness","OBJECTID")],by=c("Centroid latitude" = "Latitude","Centroid longitude" = "Longitude"))
-write.table(FieldData,"CoastligthFieldData.tsv",quote=FALSE,sep="\t",row.names = FALSE)
+#write.table(FieldData,"CoastligthFieldData.tsv",quote=FALSE,sep="\t",row.names = FALSE)
 
 #Create unique site ID.  Each site contains 5 locations.
 colnames(FieldData)[which(names(FieldData) == "OBJECTID")] <- "UniqueID"
@@ -114,32 +115,39 @@ colnames(FieldSQCMergeZH)[which(names(FieldSQCMergeZH) == "ScalarIlluminance.x")
 #Use the same %horizon values for both the full hemispheric and edited horizon images.
 FieldSQCMergeZH$Horizon <- FieldSQCMergeEH$Horizon
 FieldSQCMerge <- rbind(FieldSQCMergeZH,FieldSQCMergeEH)
-write.table(FieldSQCMerge,"CoastlightProjectFinal.csv",quote=FALSE,sep=",",row.names = FALSE)
+#write.table(FieldSQCMerge,"CoastlightProjectFinal.csv",quote=FALSE,sep=",",row.names = FALSE)
 
+#World Atlas of the Artificial Night Sky Brightness = WAANSB
 #Plot data for zero-horizon images
 LPPlotZH <- ggplot(FieldSQCMergeZH, aes(x=VIIRSBrightness,y=log10(ScalarIlluminance),color=Clouds))+geom_point()+theme(text = element_text(size=25))+geom_smooth(method=glm, aes(fill=ScalarIlluminance))
-LPPlotZH+xlab("2015 VIIRS Upwards Radiance (nW/Sr/cm^2)")+ylab("Log(Scalar Illuminance (mlx))")+scale_color_gradientn("% Cloud cover",colours = rainbow(5))
+LPPlotZH+xlab("VIIRS Upwards Radiance (nW/Sr/cm^2)")+ylab("Log(Scalar Illuminance (mlx))")+scale_color_gradientn("% Cloud\ncover",colours = plasma(10))
 #
 LPPlotZH <- ggplot(FieldSQCMergeZH, aes(x=VIIRSBrightness,y=log10(ScalarIlluminance),color=Horizon))+geom_point()+theme(text = element_text(size=25))+geom_smooth(method=glm, aes(fill=ScalarIlluminance))
-LPPlotZH+xlab("2015 VIIRS Upwards Radiance (nW/Sr/cm^2)")+ylab("Log(Scalar Illuminance (mlx))")+scale_color_gradientn("% Horizon",colours = rainbow(5))
+LPPlotZH+xlab("VIIRS Upwards Radiance (nW/Sr/cm^2)")+ylab("Log(Scalar Illuminance (mlx))")+scale_color_gradientn("% Horizon",colours = plasma(10))
 #
 LPPlotZH <- ggplot(FieldSQCMergeZH, aes(x=SQA,y=log10(ScalarIlluminance),color=Clouds))+geom_point()+theme(text = element_text(size=25))+geom_smooth(method=glm, aes(fill=ScalarIlluminance))
-LPPlotZH+xlab("2015 Sky Atlas (mcd/m^2)")+ylab("Log(Scalar Illuminance (mlx))")+scale_color_gradientn("% Cloud cover",colours = rainbow(5))
+LPPlotZH+xlab("WAANSB (mcd/m^2)")+ylab("Log(Scalar Illuminance (mlx))")+scale_color_gradientn("% Cloud\ncover",colours = plasma(10))
 #
 LPPlotZH <- ggplot(FieldSQCMergeZH, aes(x=SQA,y=log10(ScalarIlluminance),color=Horizon))+geom_point()+theme(text = element_text(size=25))+geom_smooth(method=glm, aes(fill=ScalarIlluminance))
-LPPlotZH+xlab("2015 Sky Atlas (mcd/m^2)")+ylab("Log(Scalar Illuminance (mlx)")+scale_color_gradientn("% Horizon",colours = rainbow(5))
+LPPlotZH+xlab("WAANSB (mcd/m^2)")+ylab("Log(Scalar Illuminance (mlx)")+scale_color_gradientn("% Horizon",colours = plasma(10))
 #
 LPPlotZH <- ggplot(FieldSQCMergeZH, aes(x=log10(ScalarIlluminance),y=CoVLuminance,color=Horizon))+geom_point()+theme(text = element_text(size=25))+geom_smooth(method=glm, aes(fill=CoVLuminance))
-LPPlotZH+xlab("Log(Scalar Illuminance (mlx))")+ylab("Coefficient of Variation on Scalar Illuminance")+scale_color_gradientn("% Horizon",colours = rainbow(5))
+LPPlotZH+xlab("Log(Scalar Illuminance (mlx))")+ylab("Coefficient of Variation\non Luminance")+scale_color_gradientn("% Horizon",colours = plasma(10))
 #
 LPPlotZH <- ggplot(FieldSQCMergeZH, aes(x=log10(ScalarIlluminance),y=CoVLuminance,color=Clouds))+geom_point()+theme(text = element_text(size=25))+geom_smooth(method=glm, aes(fill=CoVLuminance))
-LPPlotZH+xlab("Log(Scalar Illuminance (mlx))")+ylab("Coefficient of Variation on Scalar Illuminance")+scale_color_gradientn("% Cloud cover",colours = rainbow(5))
+LPPlotZH+xlab("Log(Scalar Illuminance (mlx))")+ylab("Coefficient of Variation\non Luminance")+scale_color_gradientn("% Cloud\ncover",colours = plasma(10))
+#
+LPPlotZH <- ggplot(FieldSQCMergeZH, aes(x=VIIRSBrightness,y=ScalarIlluminanceSiteCoV,color=Clouds))+geom_point()+theme(text = element_text(size=25))+geom_smooth(method=glm, aes(fill=CoVLuminance))
+LPPlotZH+xlab("VIIRS Upwards Radiance (nW/Sr/cm^2)")+ylab("Coefficient of Variation on\nScalar Illuminance within sites")+scale_color_gradientn("% Cloud\ncover",colours = plasma(10))
+#
+LPPlotZH <- ggplot(FieldSQCMergeZH, aes(x=VIIRSBrightness,y=ScalarIlluminanceSiteCoV,color=Horizon))+geom_point()+theme(text = element_text(size=25))+geom_smooth(method=glm, aes(fill=CoVLuminance))
+LPPlotZH+xlab("VIIRS Upwards Radiance (nW/Sr/cm^2)")+ylab("Coefficient of Variation on\nScalar Illuminance within sites")+scale_color_gradientn("% Horizon",colours = plasma(10))
 #
 LPPlotZH <- ggplot(FieldSQCMergeZH, aes(x=SQA,y=ScalarIlluminanceSiteCoV,color=Clouds))+geom_point()+theme(text = element_text(size=25))+geom_smooth(method=glm, aes(fill=CoVLuminance))
-LPPlotZH+xlab("2015 Sky Atlas (mcd/m^2)")+ylab("Coefficient of Variation on\nScalar Illuminance within sites")+scale_color_gradientn("% Cloud cover",colours = rainbow(5))
+LPPlotZH+xlab("WAANSB (mcd/m^2)")+ylab("Coefficient of Variation on\nScalar Illuminance within sites")+scale_color_gradientn("% Cloud\ncover",colours = plasma(10))
 #
 LPPlotZH <- ggplot(FieldSQCMergeZH, aes(x=SQA,y=ScalarIlluminanceSiteCoV,color=Horizon))+geom_point()+theme(text = element_text(size=25))+geom_smooth(method=glm, aes(fill=CoVLuminance))
-LPPlotZH+xlab("2015 Sky Atlas (mcd/m^2)")+ylab("Coefficient of Variation on\nScalar Illuminance within sites")+scale_color_gradientn("% Horizon",colours = rainbow(5))
+LPPlotZH+xlab("WAANSB (mcd/m^2)")+ylab("Coefficient of Variation on\nScalar Illuminance within sites")+scale_color_gradientn("% Horizon",colours = plasma(10))
 #
 
 #Fit a linear model to predict the log of the scalar illuminance from field data for zero-horizon images.
@@ -150,6 +158,12 @@ printCoefmat(coef(summary(step(LPModelZH))))
 calc.relimp(LPModelZH)
 #Initialize a simple linear model
 LPLinearModelZH <- lm(ScalarIlluminance ~ SQA, data=FieldSQCMergeZH)
+
+#Compare linear model residuals to cloud cover and horizon cover.
+SQAIntercept <- as.numeric(lm(log10(FieldSQCMergeZH$ScalarIlluminance) ~ FieldSQCMergeZH$SQA)$coefficients[1])
+SQASlope <- as.numeric(lm(log10(FieldSQCMergeZH$ScalarIlluminance) ~ FieldSQCMergeZH$SQA)$coefficients[2])
+cor.test(FieldSQCMergeZH$Clouds,(SQAIntercept+SQASlope*FieldSQCMergeZH$SQA)-log10(FieldSQCMergeZH$ScalarIlluminance))
+cor.test(FieldSQCMergeZH$Horizon,(SQAIntercept+SQASlope*FieldSQCMergeZH$SQA)-log10(FieldSQCMergeZH$ScalarIlluminance))
 
 #Fit an asymptotic model to predict the log of the scalar illuminance from field data for zero-horizon images.
 #SSasymp(input, Asym, R0, lrc)
@@ -165,20 +179,62 @@ r_0 <- summary(LPAssymptoticModelZH)[10]$coefficients[2]
 rate_constant <- summary(LPAssymptoticModelZH)[10]$coefficients[3]
 #Calculate the best-fit line assuming an asymptotic model.
 FieldSQCMergeZH$AsymptoticFit <-  asymptote+(r_0-asymptote)*exp(-exp(rate_constant)*FieldSQCMergeZH$SQA)
+#Residuals of asymptotic fit versus cloud cover and horizon cover.
+cor.test(FieldSQCMergeZH$Clouds,log10(FieldSQCMergeZH$ScalarIlluminance)-FieldSQCMergeZH$AsymptoticFit)
+cor.test(FieldSQCMergeZH$Horizon,log10(FieldSQCMergeZH$ScalarIlluminance)-FieldSQCMergeZH$AsymptoticFit)
 
 #Plot the asymptotic fit against the actual scalar illuminance.
 LPPlotZH <- ggplot(FieldSQCMergeZH, aes(x=log10(ScalarIlluminance),y=AsymptoticFit,color=Horizon))+geom_point()+theme(text = element_text(size=25))+geom_smooth(method=glm, aes(fill=AsymptoticFit))
-LPPlotZH+xlab("Measured Log(Scalar Illuminance (mlx))")+ylab("Modeled Log(Scalar Illuminance (mlx))")+scale_color_gradientn("% Horizon",colours = rainbow(5))
+LPPlotZH+xlab("Measured Log(Scalar Illuminance (mlx))")+ylab("Modeled Log(Scalar Illuminance (mlx))")+scale_color_gradientn("% Horizon",colours = plasma(10))
 #
-#Plot differences between actual scalar illuminance and modeled scalar illuminance versus %horizon.
+LPPlotZH <- ggplot(FieldSQCMergeZH, aes(x=log10(ScalarIlluminance),y=AsymptoticFit,color=Clouds))+geom_point()+theme(text = element_text(size=25))+geom_smooth(method=glm, aes(fill=AsymptoticFit))
+LPPlotZH+xlab("Measured Log(Scalar Illuminance (mlx))")+ylab("Modeled Log(Scalar Illuminance (mlx))")+scale_color_gradientn("% Cloud\nCover",colours = plasma(10))
+#
+LPPlotZH <- ggplot(FieldSQCMergeZH, aes(x=SQA,y=log10(ScalarIlluminance),color=Clouds))+geom_point()+theme(text = element_text(size=25))+stat_function(fun=function(x) asymptote+(r_0-asymptote)*exp(-exp(rate_constant)*x), size=2)
+LPPlotZH+xlab("WAANSB (mcd/m^2)")+ylab("Log(Scalar Illuminance (mlx))")+scale_color_gradientn("% Cloud\nCover",colours = plasma(10))
+#
+LPPlotZH <- ggplot(FieldSQCMergeZH, aes(x=SQA,y=log10(ScalarIlluminance),color=Horizon))+geom_point()+theme(text = element_text(size=25))+stat_function(fun=function(x) asymptote+(r_0-asymptote)*exp(-exp(rate_constant)*x), size=2)
+LPPlotZH+xlab("WAANSB (mcd/m^2)")+ylab("Log(Scalar Illuminance (mlx))")+scale_color_gradientn("% Horizon",colours = plasma(10))
+#
+LPPlotZH <- ggplot(FieldSQCMergeZH, aes(x=SQA,y=log10(ScalarIlluminance),color=`CCT (cosine Corrected)`))+geom_point()+theme(text = element_text(size=25))+stat_function(fun=function(x) asymptote+(r_0-asymptote)*exp(-exp(rate_constant)*x), size=2)
+LPPlotZH+xlab("WAANSB (mcd/m^2)")+ylab("Log(Scalar Illuminance (mlx))")+scale_color_gradientn("CCT (K)",colours = plasma(10))
+#
+#Plot differences between actual scalar illuminance and modeled scalar illuminance versus other factors.
 LPPlotZH <- ggplot(FieldSQCMergeZH, aes(x=Horizon,y=log10(ScalarIlluminance)-AsymptoticFit))+geom_point()+theme(text = element_text(size=25))+geom_smooth(method=glm, aes(fill=log10(ScalarIlluminance)-AsymptoticFit))
 LPPlotZH+xlab("% Horizon")+ylab("Measured-Modeled\nLog(Scalar Illuminance (mlx))")
 #
+LPPlotZH <- ggplot(FieldSQCMergeZH, aes(x=`CCT (cosine Corrected)`,y=log10(ScalarIlluminance)-AsymptoticFit))+geom_point()+theme(text = element_text(size=25))+geom_smooth(method=glm, aes(fill=log10(ScalarIlluminance)-AsymptoticFit))
+LPPlotZH+xlab("CCT(K)")+ylab("Measured-Modeled\nLog(Scalar Illuminance (mlx))")
+#
+LPPlotZH <- ggplot(FieldSQCMergeZH, aes(x=`CCT (cosine Corrected)`,y=log10(ScalarIlluminance)-AsymptoticFit,color=Horizon))+geom_point()+theme(text = element_text(size=25))+geom_smooth(method=glm, aes(fill=log10(ScalarIlluminance)-AsymptoticFit))
+LPPlotZH+xlab("CCT(K)")+ylab("Measured-Modeled\nLog(Scalar Illuminance (mlx))")+scale_color_gradientn("% Horizon",colours = plasma(10))
+#
+LPPlotZH <- ggplot(FieldSQCMergeZH, aes(x=SQA,y=log10(ScalarIlluminance)-AsymptoticFit,color=`CCT (cosine Corrected)`))+geom_point()+theme(text = element_text(size=25))
+LPPlotZH+xlab("WAANSB (mcd/m^2)")+ylab("Measured-Modeled\nLog(Scalar Illuminance (mlx))")+scale_color_gradientn("CCT (K)",colours = plasma(10))
+
+
 #Compare the asymptotic fit against the actual scalar illuminance for images above or below a certain threshold of horizon coverage.
 FieldSQCMergeZHSubset <- subset(FieldSQCMergeZH,FieldSQCMergeZH$Horizon<14.9)
 LPPlotZH <- ggplot(FieldSQCMergeZHSubset, aes(x=log10(ScalarIlluminance),y=AsymptoticFit,color=Horizon))+geom_point()+theme(text = element_text(size=25))+geom_smooth(method=glm, aes(fill=AsymptoticFit))
-LPPlotZH+xlab("Measured Log(Scalar Illuminance (mlx))")+ylab("Modeled Log(Scalar Illuminance (mlx))")+scale_color_gradientn("% Horizon",colours = rainbow(5))
+LPPlotZH+xlab("Measured Log(Scalar Illuminance (mlx))")+ylab("Modeled Log(Scalar Illuminance (mlx))")+scale_color_gradientn("% Horizon",colours = plasma(10))
 cor.test(FieldSQCMergeZHSubset$AsymptoticFit,log10(FieldSQCMergeZHSubset$ScalarIlluminance))
+#
+
+#Try a logrithmic model of scalar illuminance versus WAANSB.
+LPLogModelZH <- lm(log10(ScalarIlluminance)~log10(SQA),data=FieldSQCMergeZH)
+FieldSQCMergeZH$LogFit <- log10(FieldSQCMergeZH$SQA*LPLogModelZH$coefficients[2])+LPLogModelZH$coefficients[1]
+LPPlotZH <- ggplot(FieldSQCMergeZH, aes(x=SQA,y=log10(ScalarIlluminance),color=Horizon))+geom_point()+theme(text = element_text(size=25))+stat_function(fun=function(x) log10(x*LPLogModelZH$coefficients[2])+LPLogModelZH$coefficients[1], size=2)
+LPPlotZH+xlab("WAANSB (mcd/m^2)")+ylab("Log(Scalar Illuminance (mlx))")+scale_color_gradientn("% Horizon",colours = plasma(10))
+#
+LPPlotZH <- ggplot(FieldSQCMergeZH, aes(x=SQA,y=log10(ScalarIlluminance),color=Clouds))+geom_point()+theme(text = element_text(size=25))+stat_function(fun=function(x) log10(x*LPLogModelZH$coefficients[2])+LPLogModelZH$coefficients[1], size=2)
+LPPlotZH+xlab("WAANSB (mcd/m^2)")+ylab("Log(Scalar Illuminance (mlx))")+scale_color_gradientn("% Cloud\nCover",colours = plasma(10))
+#
+LPPlotZH <- ggplot(FieldSQCMergeZH, aes(x=SQA,y=log10(ScalarIlluminance),color=`CCT (cosine Corrected)`))+geom_point()+theme(text = element_text(size=25))+stat_function(fun=function(x) log10(x*LPLogModelZH$coefficients[2])+LPLogModelZH$coefficients[1], size=2)
+LPPlotZH+xlab("WAANSB (mcd/m^2)")+ylab("Log(Scalar Illuminance (mlx))")+scale_color_gradientn("CCT (K)",colours = rev(plasma(10)))
+#
+#Plot differences between actual scalar illuminance and modeled scalar illuminance versus other factors.
+LPPlotZH <- ggplot(subset(FieldSQCMergeZH,FieldSQCMergeZH$Horizon<=15 & FieldSQCMergeZH$`CCT (cosine Corrected)`<=3220), aes(x=SQA,y=log10(ScalarIlluminance)-LogFit,color=`CCT (cosine Corrected)`))+geom_point()+theme(text = element_text(size=25))
+LPPlotZH+xlab("WAANSB (mcd/m^2)")+ylab("Measured-LogFit\nLog(Scalar Illuminance (mlx))")+scale_color_gradientn("CCT (K)",colours = plasma(10))
 #
 
 #Fit a broken stick model of scalar illuminance to the Sky Quality Atlas.
@@ -193,7 +249,7 @@ LPSegmentedModelZH$psi
 slope(LPSegmentedModelZH)
 #Plot segmented model.
 LPPlotZH <- ggplot(FieldSQCMergeZH, aes(x = SQA, y = log10(ScalarIlluminance), color = Horizon))+geom_point()+theme(text = element_text(size=25))+geom_line(data=FieldSQCMergeZH,aes(x=SQA,y=fitted(LPSegmentedModelZH)),color="black")
-LPPlotZH+xlab("2015 Sky Atlas (mcd/m^2)")+ylab("Modeled Log(Scalar Illuminance (mlx))")+scale_color_gradientn("% Horizon",colours = rainbow(5))
+LPPlotZH+xlab("WAANSB (mcd/m^2)")+ylab("Modeled Log(Scalar Illuminance (mlx))")+scale_color_gradientn("% Horizon",colours = plasma(10))
 
 ##Correlations of variance light pollution variables.
 #Each significance level is associated to a symbol : p-values(0, 0.001, 0.01, 0.05, 0.1, 1) <=> symbols(“***”, “**”, “*”, “.”, " “)
@@ -201,7 +257,8 @@ chart.Correlation(FieldSQCMergeZH[,c("Scalar Illuminance","SDLuminance","SQM2015
 chart.Correlation(FieldSQCMergeEH[,c("Scalar Illuminance","SDLuminance","SQM2015Atlas (mcd/m^2)","Brightness (nW/Sr/cm^2)","Clouds","Horizon","HorizonLuminanceFraction")], histogram=FALSE, method="spearman")
 
 #To map various measures of coastal light pollution.
-MapCoordinates <- subset(FieldSQCMergeZH, FieldSQCMergeZH$SQA > 9.39)
+#MapCoordinates <- subset(FieldSQCMergeZH, FieldSQCMergeZH$SQA > 9.39)
+MapCoordinates <- FieldSQCMergeZH
 colnames(MapCoordinates)[which(names(MapCoordinates) == "Latitude")] <- "SQCLatitude"
 colnames(MapCoordinates)[which(names(MapCoordinates) == "Longitude")] <- "SQCLongitude"
 colnames(MapCoordinates)[which(names(MapCoordinates) == "Adjusted latitude")] <- "latitude"
@@ -209,7 +266,7 @@ colnames(MapCoordinates)[which(names(MapCoordinates) == "Adjusted longitude")] <
 MapCoordinates <- MapCoordinates[!is.na(MapCoordinates$latitude) & !is.na(MapCoordinates$longitude),]
 CalMap = leaflet(MapCoordinates) %>% 
   addTiles()
-ColorScale <- colorNumeric(palette=rainbow(10),domain=log10(FieldSQCMergeZH$ScalarIlluminance))
+ColorScale <- colorNumeric(palette=plasma(10),domain=log10(FieldSQCMergeZH$ScalarIlluminance))
 CalMap %>% addCircleMarkers(color = ~ColorScale(log10(ScalarIlluminance)), fill = TRUE,radius=2,fillOpacity = 0.1) %>% 
   addProviderTiles(providers$Esri.WorldTopoMap) %>%
-  leaflet::addLegend(position="topright", pal=ColorScale,values=~log10(ScalarIlluminance),title="Log(Scalar Illuminance (mlx))")
+  leaflet::addLegend(position="topright", pal=ColorScale,values=~log10(ScalarIlluminance),opacity=1,title="Log(Scalar Illuminance (mlx))")
