@@ -144,7 +144,7 @@ FieldSQCMergeZHSubset <- na.omit(FieldSQCMergeZHSubset,cols=c("LogFit"))
 cor.test(log10(FieldSQCMergeZHSubset$SQA),log10(FieldSQCMergeZHSubset$`Ring 1Luminance`))
 #Plot model
 LPPlotZH <- ggplot(FieldSQCMergeZHSubset, aes(x=log10(SQA),y=log10(`Ring 1Luminance`),color=`Ring 1CCT`))+geom_point()+theme(text = element_text(size=25))+geom_smooth(method=glm, aes(fill=LogFit))
-LPPlotZH+xlab(bquote("Log(WAANSB)"~log(mcd/m^2)))+ylab("Log(Ring 1 Luminance (mlx))")+scale_color_gradientn("Ring 1\nCCT (K)",colours = rev(plasma(10)))
+LPPlotZH+xlab(bquote("Log(WAANSB)"~log(mcd/m^2)))+ylab("Log(Luminance (mlx))\nTop 30 degrees")+scale_color_gradientn("CCT (K)",colours = rev(plasma(10)))
 
 #Plot fitted scalar illuminance (Using log model) versus log(WAANSB) for ring 1 (Top 30 degrees of the sky using images without cloud cover)
 FieldSQCMergeZHSubset <- na.omit(subset(FieldSQCMergeZH,Clouds==0),cols=c("Ring 1Luminance","Ring 1CCT"))
@@ -154,7 +154,7 @@ FieldSQCMergeZHSubset <- na.omit(FieldSQCMergeZHSubset,cols=c("LogFit"))
 cor.test(log10(FieldSQCMergeZHSubset$SQA),log10(FieldSQCMergeZHSubset$`Ring 1Luminance`))
 #Plot model
 LPPlotZH <- ggplot(FieldSQCMergeZHSubset, aes(x=log10(SQA),y=log10(`Ring 1Luminance`),color=`Ring 1CCT`))+geom_point()+theme(text = element_text(size=25))+geom_smooth(method=glm, aes(fill=LogFit))
-LPPlotZH+xlab(bquote("Log(WAANSB)"~log(mcd/m^2)))+ylab("Log(Ring 1 Luminance (mlx))")+scale_color_gradientn("Ring 1\nCCT (K)",colours = rev(plasma(10)))
+LPPlotZH+xlab(bquote("Log(WAANSB)"~log(mcd/m^2)))+ylab("Log(Luminance (mlx))\nTop 30 degrees")+scale_color_gradientn("CCT (K)",colours = rev(plasma(10)))
 
 #Plot fitted scalar illuminance (Using log model) versus log(WAANSB) for ring 7 (Bottom 10 degrees of the sky using full hemispheric images)
 FieldSQCMergeZHSubset <- na.omit(FieldSQCMergeZH,cols=c("Ring 7Luminance","Ring 7CCT"))
@@ -164,7 +164,7 @@ FieldSQCMergeZHSubset <- na.omit(FieldSQCMergeZHSubset,cols=c("LogFit"))
 cor.test(log10(FieldSQCMergeZHSubset$SQA),log10(FieldSQCMergeZHSubset$`Ring 7Luminance`))
 #Plot model
 LPPlotZH <- ggplot(FieldSQCMergeZHSubset, aes(x=log10(SQA),y=log10(`Ring 7Luminance`),color=`Ring 7CCT`))+geom_point()+theme(text = element_text(size=25))+geom_smooth(method=glm, aes(fill=LogFit))
-LPPlotZH+xlab(bquote("Log(WAANSB)"~log(mcd/m^2)))+ylab("Log(Ring 7 Luminance (mlx))")+scale_color_gradientn("Ring 7\nCCT (K)",colours = rev(plasma(10)))
+LPPlotZH+xlab(bquote("Log(WAANSB)"~log(mcd/m^2)))+ylab("Log(Luminance (mlx))\nBottom 10 degrees")+scale_color_gradientn("CCT (K)",colours = rev(plasma(10)))
 
 #Plot fitted scalar illuminance (Using log model) versus log(WAANSB) for ring 7 (Bottom 10 degrees of the sky using images without cloud cover)
 FieldSQCMergeZHSubset <- na.omit(subset(FieldSQCMergeZH,Clouds==0),cols=c("Ring 7Luminance","Ring 7CCT"))
@@ -174,7 +174,7 @@ FieldSQCMergeZHSubset <- na.omit(FieldSQCMergeZHSubset,cols=c("LogFit"))
 cor.test(log10(FieldSQCMergeZHSubset$SQA),log10(FieldSQCMergeZHSubset$`Ring 7Luminance`))
 #Plot model
 LPPlotZH <- ggplot(FieldSQCMergeZHSubset, aes(x=log10(SQA),y=log10(`Ring 7Luminance`),color=`Ring 7CCT`))+geom_point()+theme(text = element_text(size=25))+geom_smooth(method=glm, aes(fill=LogFit))
-LPPlotZH+xlab(bquote("Log(WAANSB)"~log(mcd/m^2)))+ylab("Log(Ring 7 Luminance (mlx))")+scale_color_gradientn("Ring 7\nCCT (K)",colours = rev(plasma(10)))
+LPPlotZH+xlab(bquote("Log(WAANSB)"~log(mcd/m^2)))+ylab("Log(Luminance (mlx))\nBottom 10 degrees")+scale_color_gradientn("CCT (K)",colours = rev(plasma(10)))
 
 #Try a logrithmic model of scalar illuminance versus WAANSB for the full data set for the edited horizon hemispheric images.
 LPLogModelEH <- lm(log10(ScalarIlluminance)~log10(SQA),data=FieldSQCMergeEH)
@@ -183,6 +183,15 @@ cor.test(log10(FieldSQCMergeEH$ScalarIlluminance),log10(FieldSQCMergeZH$SQA))
 #Plot model
 LPPlotZH <- ggplot(FieldSQCMergeEH, aes(x=log10(SQA),y=log10(ScalarIlluminance),color=`CCT (Scalar)`))+geom_point()+theme(text = element_text(size=25))+geom_smooth(method=glm, aes(fill=LogFit))
 LPPlotZH+xlab(bquote("Log(WAANSB)"~log(mcd/m^2)))+ylab("Log(SI (mlx))")+scale_color_gradientn("CCT (K)",colours = rev(plasma(10)))
+
+#Try a logrithmic model of scalar illuminance versus WAANSB for the full set of edited horizon images.
+FieldSQCMergeEHSubset <- FieldSQCMergeEH
+LPLogModelEH <- lm(log10(ScalarIlluminance)~log10(SQA),data=FieldSQCMergeEHSubset)
+FieldSQCMergeEHSubset$LogFit <- log10(FieldSQCMergeEHSubset$SQA*LPLogModelZH$coefficients[2])+LPLogModelEH$coefficients[1]
+cor.test(log10(FieldSQCMergeEHSubset$ScalarIlluminance),log10(FieldSQCMergeEHSubset$SQA))
+#Plot model
+LPPlotEH <- ggplot(FieldSQCMergeEHSubset, aes(x=log10(SQA),y=log10(ScalarIlluminance),color=`CCT (Scalar)`))+geom_point()+theme(text = element_text(size=25))+geom_smooth(method=glm, aes(fill=LogFit))
+LPPlotEH+xlab(bquote("Log(WAANSB)"~log(mcd/m^2)))+ylab("Log(SI (mlx))")+scale_color_gradientn("CCT (K)",colours = rev(plasma(10)))
 
 #Try a logrithmic model of scalar illuminance versus WAANSB for the data set with no cloud cover for the edited horizon images.
 FieldSQCMergeEHSubset <- subset(FieldSQCMergeEH,Clouds==0)
@@ -228,4 +237,23 @@ tmp <- tmp[!duplicated(tmp),]
 tmp$Ring <- as.factor(tmp$Ring)
 LPBoxPlot <- ggplot(tmp,aes(x=Ring,y=Luminance))+geom_boxplot()
 LPBoxPlot <- LPBoxPlot + scale_x_discrete(name = "Section of sky") + scale_y_continuous(name = bquote("Luminance"~(mcd/m^2)))
-LPBoxPlot <- LPBoxPlot  + theme(axis.text.x=element_text(colour="black", size = 12), axis.text.y=element_text(colour="black", size = 12),text=element_text(size = 16))
+LPBoxPlot <- LPBoxPlot  + theme(axis.text.x=element_text(colour="black", size = 25), axis.text.y=element_text(colour="black", size = 25),text=element_text(size = 25))
+LPBoxPlot
+wilcox.test(na.omit(FieldSQCMergeZH$`Ring 1Luminance`),na.omit(FieldSQCMergeZH$`Ring 7Luminance`),alternative="two.sided")
+
+#Boxplot of color temperature values for the top and bottom rings of the sky.
+tmp <- as.data.frame(FieldSQCMergeZH$`Ring 1CCT`)
+colnames(tmp) <- c("CCT")
+tmp$Ring <- "Top 30 degrees"
+tmp2 <- as.data.frame(FieldSQCMergeZH$`Ring 7CCT`)
+colnames(tmp2) <- c("CCT")
+tmp2$Ring <- "Bottom 10 degrees"
+tmp <- rbind(tmp,tmp2)
+tmp <- na.omit(tmp)
+tmp <- tmp[!duplicated(tmp),]
+tmp$Ring <- as.factor(tmp$Ring)
+LPBoxPlot <- ggplot(tmp,aes(x=Ring,y=CCT))+geom_boxplot()
+LPBoxPlot <- LPBoxPlot + scale_x_discrete(name = "Section of sky") + scale_y_continuous(name = "CCT (K)")
+LPBoxPlot <- LPBoxPlot  + theme(axis.text.x=element_text(colour="black", size = 25), axis.text.y=element_text(colour="black", size = 25),text=element_text(size = 25))
+LPBoxPlot
+wilcox.test(na.omit(FieldSQCMergeZH$`Ring 1CCT`),na.omit(FieldSQCMergeZH$`Ring 7CCT`),alternative="two.sided")
