@@ -201,7 +201,9 @@ LPPlotZH <- ggplot(FieldSQCMergeZHSubset, aes(x=log10(`Ring 1Luminance`),y=`Ring
 LPPlotZH+xlab( bquote("Log(Ring 1 Luminance)"~log(mcd/m^2)))+ylab("Ring 1 CCT (K)")
 cor.test(FieldSQCMergeZHSubset$`Ring 1CCT`,log10(FieldSQCMergeZHSubset$`Ring 1Luminance`))
 mean(FieldSQCMergeZHSubset$`Ring 1CCT`)
+sd(FieldSQCMergeZHSubset$`Ring 1CCT`)
 mean(FieldSQCMergeZHSubset$`Ring 1Luminance`)
+sd(FieldSQCMergeZHSubset$`Ring 1Luminance`)
 
 #Plot color temperature versus luminance for ring 7, the bottom 10 degrees of the sky.  Use full hemispheric images.
 FieldSQCMergeZHSubset <- na.omit(FieldSQCMergeZH,cols=c("Ring 7Luminance","Ring 7CCT"))
@@ -209,4 +211,21 @@ LPPlotZH <- ggplot(FieldSQCMergeZHSubset, aes(x=log10(`Ring 7Luminance`),y=`Ring
 LPPlotZH+xlab( bquote("Log(Ring 7 Luminance)"~(mcd/m^2)))+ylab("Ring 7 CCT (K)")
 cor.test(FieldSQCMergeZHSubset$`Ring 7CCT`,log10(FieldSQCMergeZHSubset$`Ring 7Luminance`))
 mean(FieldSQCMergeZHSubset$`Ring 7CCT`)
+sd(FieldSQCMergeZHSubset$`Ring 7CCT`)
 mean(FieldSQCMergeZHSubset$`Ring 7Luminance`)
+sd(FieldSQCMergeZHSubset$`Ring 7Luminance`)
+
+#Boxplot of luminance values for the top and bottom rings of the sky.
+tmp <- as.data.frame(FieldSQCMergeZH$`Ring 1Luminance`)
+colnames(tmp) <- c("Luminance")
+tmp$Ring <- "Top 30 degrees"
+tmp2 <- as.data.frame(FieldSQCMergeZH$`Ring 7Luminance`)
+colnames(tmp2) <- c("Luminance")
+tmp2$Ring <- "Bottom 10 degrees"
+tmp <- rbind(tmp,tmp2)
+tmp <- na.omit(tmp)
+tmp <- tmp[!duplicated(tmp),]
+tmp$Ring <- as.factor(tmp$Ring)
+LPBoxPlot <- ggplot(tmp,aes(x=Ring,y=Luminance))+geom_boxplot()
+LPBoxPlot <- LPBoxPlot + scale_x_discrete(name = "Section of sky") + scale_y_continuous(name = bquote("Luminance"~(mcd/m^2)))
+LPBoxPlot <- LPBoxPlot  + theme(axis.text.x=element_text(colour="black", size = 12), axis.text.y=element_text(colour="black", size = 12),text=element_text(size = 16))
