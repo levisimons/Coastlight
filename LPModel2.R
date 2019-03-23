@@ -115,7 +115,27 @@ colnames(FieldSQCMergeZH)[which(names(FieldSQCMergeZH) == "ScalarIlluminance.x")
 FieldSQCMergeZH$Horizon <- FieldSQCMergeEH$Horizon
 FieldSQCMerge <- rbind(FieldSQCMergeZH,FieldSQCMergeEH)
 
-#Compare models generated from full sky scalar illuminance, or the luminance from particular bands of the sky.
+#Compare models generated from full sky scalar illuminance, or the luminance from particular bands of the sky, using WAANSB and the input variable.
+#Try a logrithmic model of scalar illuminance versus VIIRS for the full data set for the full hemispheric images.
+LPLogModelZH <- lm(log10(ScalarIlluminance)~log10(VIIRSBrightness+1),data=FieldSQCMergeZH)
+FieldSQCMergeZH$LogFit <- log10((FieldSQCMergeZH$VIIRSBrightness+1)*LPLogModelZH$coefficients[2])+LPLogModelZH$coefficients[1]
+FieldSQCMergeZHSubset <- na.omit(FieldSQCMergeZH,cols=c("LogFit"))
+cor.test(log10(FieldSQCMergeZHSubset$ScalarIlluminance),log10(FieldSQCMergeZHSubset$VIIRSBrightness+1))
+#Plot model
+LPPlotZH <- ggplot(FieldSQCMergeZHSubset, aes(x=log10(VIIRSBrightness+1),y=log10(ScalarIlluminance),color=`CCT (Scalar)`))+geom_point()+theme(text = element_text(size=25))+geom_smooth(method=glm, aes(fill=LogFit))
+LPPlotZH+xlab(bquote("Log(VIIRS+1)"~log(nW/Sr/cm^2)))+ylab("Log(SI (mlx))")+scale_color_gradientn("CCT (K)",colours = rev(plasma(10)),limits=c(1500,5000))
+
+#Try a logrithmic model of scalar illuminance versus VIIRS for the full data set for the full hemispheric images.
+FieldSQCMergeZHSubset <- subset(FieldSQCMergeZH,Clouds==0)
+LPLogModelZH <- lm(log10(ScalarIlluminance)~log10(VIIRSBrightness+1),data=FieldSQCMergeZHSubset)
+FieldSQCMergeZHSubset$LogFit <- log10((FieldSQCMergeZHSubset$VIIRSBrightness+1)*LPLogModelZH$coefficients[2])+LPLogModelZH$coefficients[1]
+FieldSQCMergeZHSubset <- na.omit(FieldSQCMergeZHSubset,cols=c("LogFit"))
+cor.test(log10(FieldSQCMergeZHSubset$ScalarIlluminance),log10(FieldSQCMergeZHSubset$VIIRSBrightness+1))
+#Plot model
+LPPlotZH <- ggplot(FieldSQCMergeZHSubset, aes(x=log10(VIIRSBrightness+1),y=log10(ScalarIlluminance),color=`CCT (Scalar)`))+geom_point()+theme(text = element_text(size=25))+geom_smooth(method=glm, aes(fill=LogFit))
+LPPlotZH+xlab(bquote("Log(VIIRS+1)"~log(nW/Sr/cm^2)))+ylab("Log(SI (mlx))")+scale_color_gradientn("CCT (K)",colours = rev(plasma(10)),limits=c(1500,5000))
+
+#Compare models generated from full sky scalar illuminance, or the luminance from particular bands of the sky, using WAANSB and the input variable.
 
 #Try a logrithmic model of scalar illuminance versus WAANSB for the full data set for the full hemispheric images.
 LPLogModelZH <- lm(log10(ScalarIlluminance)~log10(SQA),data=FieldSQCMergeZH)
@@ -124,7 +144,7 @@ FieldSQCMergeZHSubset <- na.omit(FieldSQCMergeZH,cols=c("LogFit"))
 cor.test(log10(FieldSQCMergeZHSubset$ScalarIlluminance),log10(FieldSQCMergeZHSubset$SQA))
 #Plot model
 LPPlotZH <- ggplot(FieldSQCMergeZHSubset, aes(x=log10(SQA),y=log10(ScalarIlluminance),color=`CCT (Scalar)`))+geom_point()+theme(text = element_text(size=25))+geom_smooth(method=glm, aes(fill=LogFit))
-LPPlotZH+xlab(bquote("Log(WAANSB)"~log(mcd/m^2)))+ylab("Log(SI (mlx))")+scale_color_gradientn("CCT (K)",colours = rev(plasma(10)))
+LPPlotZH+xlab(bquote("Log(WAANSB)"~log(mcd/m^2)))+ylab("Log(SI (mlx))")+scale_color_gradientn("CCT (K)",colours = rev(plasma(10)),limits=c(1500,5000))
 
 #Try a logrithmic model of scalar illuminance versus WAANSB for the data set with no cloud cover for the full hemispheric images.
 FieldSQCMergeZHSubset <- subset(FieldSQCMergeZH,Clouds==0)
@@ -134,7 +154,7 @@ FieldSQCMergeZHSubset <- na.omit(FieldSQCMergeZHSubset,cols=c("LogFit"))
 cor.test(log10(FieldSQCMergeZHSubset$ScalarIlluminance),log10(FieldSQCMergeZHSubset$SQA))
 #Plot model
 LPPlotZH <- ggplot(FieldSQCMergeZHSubset, aes(x=log10(SQA),y=log10(ScalarIlluminance),color=`CCT (Scalar)`))+geom_point()+theme(text = element_text(size=25))+geom_smooth(method=glm, aes(fill=LogFit))
-LPPlotZH+xlab(bquote("Log(WAANSB)"~log(mcd/m^2)))+ylab("Log(SI (mlx))")+scale_color_gradientn("CCT (K)",colours = rev(plasma(10)))
+LPPlotZH+xlab(bquote("Log(WAANSB)"~log(mcd/m^2)))+ylab("Log(SI (mlx))")+scale_color_gradientn("CCT (K)",colours = rev(plasma(10)),limits=c(1500,5000))
 
 #Plot fitted scalar illuminance (Using log model) versus log(WAANSB) for ring 1 (Top 30 degrees of the sky using full hemispheric images)
 FieldSQCMergeZHSubset <- na.omit(FieldSQCMergeZH,cols=c("Ring 1Luminance","Ring 1CCT"))
@@ -144,7 +164,7 @@ FieldSQCMergeZHSubset <- na.omit(FieldSQCMergeZHSubset,cols=c("LogFit"))
 cor.test(log10(FieldSQCMergeZHSubset$SQA),log10(FieldSQCMergeZHSubset$`Ring 1Luminance`))
 #Plot model
 LPPlotZH <- ggplot(FieldSQCMergeZHSubset, aes(x=log10(SQA),y=log10(`Ring 1Luminance`),color=`Ring 1CCT`))+geom_point()+theme(text = element_text(size=25))+geom_smooth(method=glm, aes(fill=LogFit))
-LPPlotZH+xlab(bquote("Log(WAANSB)"~log(mcd/m^2)))+ylab("Log(Luminance (mlx))\nTop 30 degrees")+scale_color_gradientn("CCT (K)",colours = rev(plasma(10)))
+LPPlotZH+xlab(bquote("Log(WAANSB)"~log(mcd/m^2)))+ylab("Log(Luminance (mlx))\nTop 30 degrees")+scale_color_gradientn("CCT (K)",colours = rev(plasma(10)),limits=c(1500,5000))
 
 #Plot fitted scalar illuminance (Using log model) versus log(WAANSB) for ring 1 (Top 30 degrees of the sky using images without cloud cover)
 FieldSQCMergeZHSubset <- na.omit(subset(FieldSQCMergeZH,Clouds==0),cols=c("Ring 1Luminance","Ring 1CCT"))
@@ -154,7 +174,7 @@ FieldSQCMergeZHSubset <- na.omit(FieldSQCMergeZHSubset,cols=c("LogFit"))
 cor.test(log10(FieldSQCMergeZHSubset$SQA),log10(FieldSQCMergeZHSubset$`Ring 1Luminance`))
 #Plot model
 LPPlotZH <- ggplot(FieldSQCMergeZHSubset, aes(x=log10(SQA),y=log10(`Ring 1Luminance`),color=`Ring 1CCT`))+geom_point()+theme(text = element_text(size=25))+geom_smooth(method=glm, aes(fill=LogFit))
-LPPlotZH+xlab(bquote("Log(WAANSB)"~log(mcd/m^2)))+ylab("Log(Luminance (mlx))\nTop 30 degrees")+scale_color_gradientn("CCT (K)",colours = rev(plasma(10)))
+LPPlotZH+xlab(bquote("Log(WAANSB)"~log(mcd/m^2)))+ylab("Log(Luminance (mlx))\nTop 30 degrees")+scale_color_gradientn("CCT (K)",colours = rev(plasma(10)),limits=c(1500,5000))
 
 #Plot fitted scalar illuminance (Using log model) versus log(WAANSB) for ring 7 (Bottom 10 degrees of the sky using full hemispheric images)
 FieldSQCMergeZHSubset <- na.omit(FieldSQCMergeZH,cols=c("Ring 7Luminance","Ring 7CCT"))
@@ -164,7 +184,7 @@ FieldSQCMergeZHSubset <- na.omit(FieldSQCMergeZHSubset,cols=c("LogFit"))
 cor.test(log10(FieldSQCMergeZHSubset$SQA),log10(FieldSQCMergeZHSubset$`Ring 7Luminance`))
 #Plot model
 LPPlotZH <- ggplot(FieldSQCMergeZHSubset, aes(x=log10(SQA),y=log10(`Ring 7Luminance`),color=`Ring 7CCT`))+geom_point()+theme(text = element_text(size=25))+geom_smooth(method=glm, aes(fill=LogFit))
-LPPlotZH+xlab(bquote("Log(WAANSB)"~log(mcd/m^2)))+ylab("Log(Luminance (mlx))\nBottom 10 degrees")+scale_color_gradientn("CCT (K)",colours = rev(plasma(10)))
+LPPlotZH+xlab(bquote("Log(WAANSB)"~log(mcd/m^2)))+ylab("Log(Luminance (mlx))\nBottom 10 degrees")+scale_color_gradientn("CCT (K)",colours = rev(plasma(10)),limits=c(1500,5000))
 
 #Plot fitted scalar illuminance (Using log model) versus log(WAANSB) for ring 7 (Bottom 10 degrees of the sky using images without cloud cover)
 FieldSQCMergeZHSubset <- na.omit(subset(FieldSQCMergeZH,Clouds==0),cols=c("Ring 7Luminance","Ring 7CCT"))
@@ -174,15 +194,7 @@ FieldSQCMergeZHSubset <- na.omit(FieldSQCMergeZHSubset,cols=c("LogFit"))
 cor.test(log10(FieldSQCMergeZHSubset$SQA),log10(FieldSQCMergeZHSubset$`Ring 7Luminance`))
 #Plot model
 LPPlotZH <- ggplot(FieldSQCMergeZHSubset, aes(x=log10(SQA),y=log10(`Ring 7Luminance`),color=`Ring 7CCT`))+geom_point()+theme(text = element_text(size=25))+geom_smooth(method=glm, aes(fill=LogFit))
-LPPlotZH+xlab(bquote("Log(WAANSB)"~log(mcd/m^2)))+ylab("Log(Luminance (mlx))\nBottom 10 degrees")+scale_color_gradientn("CCT (K)",colours = rev(plasma(10)))
-
-#Try a logrithmic model of scalar illuminance versus WAANSB for the full data set for the edited horizon hemispheric images.
-LPLogModelEH <- lm(log10(ScalarIlluminance)~log10(SQA),data=FieldSQCMergeEH)
-FieldSQCMergeEH$LogFit <- log10(FieldSQCMergeEH$SQA*LPLogModelZH$coefficients[2])+LPLogModelEH$coefficients[1]
-cor.test(log10(FieldSQCMergeEH$ScalarIlluminance),log10(FieldSQCMergeZH$SQA))
-#Plot model
-LPPlotZH <- ggplot(FieldSQCMergeEH, aes(x=log10(SQA),y=log10(ScalarIlluminance),color=`CCT (Scalar)`))+geom_point()+theme(text = element_text(size=25))+geom_smooth(method=glm, aes(fill=LogFit))
-LPPlotZH+xlab(bquote("Log(WAANSB)"~log(mcd/m^2)))+ylab("Log(SI (mlx))")+scale_color_gradientn("CCT (K)",colours = rev(plasma(10)))
+LPPlotZH+xlab(bquote("Log(WAANSB)"~log(mcd/m^2)))+ylab("Log(Luminance (mlx))\nBottom 10 degrees")+scale_color_gradientn("CCT (K)",colours = rev(plasma(10)),limits=c(1500,5000))
 
 #Try a logrithmic model of scalar illuminance versus WAANSB for the full set of edited horizon images.
 FieldSQCMergeEHSubset <- FieldSQCMergeEH
@@ -191,7 +203,7 @@ FieldSQCMergeEHSubset$LogFit <- log10(FieldSQCMergeEHSubset$SQA*LPLogModelZH$coe
 cor.test(log10(FieldSQCMergeEHSubset$ScalarIlluminance),log10(FieldSQCMergeEHSubset$SQA))
 #Plot model
 LPPlotEH <- ggplot(FieldSQCMergeEHSubset, aes(x=log10(SQA),y=log10(ScalarIlluminance),color=`CCT (Scalar)`))+geom_point()+theme(text = element_text(size=25))+geom_smooth(method=glm, aes(fill=LogFit))
-LPPlotEH+xlab(bquote("Log(WAANSB)"~log(mcd/m^2)))+ylab("Log(SI (mlx))")+scale_color_gradientn("CCT (K)",colours = rev(plasma(10)))
+LPPlotEH+xlab(bquote("Log(WAANSB)"~log(mcd/m^2)))+ylab("Log(SI (mlx))")+scale_color_gradientn("CCT (K)",colours = rev(plasma(10)),limits=c(1500,5000))
 
 #Try a logrithmic model of scalar illuminance versus WAANSB for the data set with no cloud cover for the edited horizon images.
 FieldSQCMergeEHSubset <- subset(FieldSQCMergeEH,Clouds==0)
@@ -200,7 +212,7 @@ FieldSQCMergeEHSubset$LogFit <- log10(FieldSQCMergeEHSubset$SQA*LPLogModelZH$coe
 cor.test(FieldSQCMergeEHSubset$LogFit,FieldSQCMergeEHSubset$SQA)
 #Plot model
 LPPlotEH <- ggplot(FieldSQCMergeEHSubset, aes(x=log10(SQA),y=log10(ScalarIlluminance),color=`CCT (Scalar)`))+geom_point()+theme(text = element_text(size=25))+geom_smooth(method=glm, aes(fill=LogFit))
-LPPlotEH+xlab(bquote("Log(WAANSB)"~log(mcd/m^2)))+ylab("Log(SI (mlx))")+scale_color_gradientn("CCT (K)",colours = rev(plasma(10)))
+LPPlotEH+xlab(bquote("Log(WAANSB)"~log(mcd/m^2)))+ylab("Log(SI (mlx))")+scale_color_gradientn("CCT (K)",colours = rev(plasma(10)),limits=c(1500,5000))
 
 ##Color temperature versus luminance for the top and bottom bands of the sky.
 
@@ -257,3 +269,21 @@ LPBoxPlot <- LPBoxPlot + scale_x_discrete(name = "Section of sky") + scale_y_con
 LPBoxPlot <- LPBoxPlot  + theme(axis.text.x=element_text(colour="black", size = 25), axis.text.y=element_text(colour="black", size = 25),text=element_text(size = 25))
 LPBoxPlot
 wilcox.test(na.omit(FieldSQCMergeZH$`Ring 1CCT`),na.omit(FieldSQCMergeZH$`Ring 7CCT`),alternative="two.sided")
+
+#Plot coefficient of variation on scalar illuminance within VIIRS pixels.
+LPPlotZH <- ggplot(FieldSQCMergeZH, aes(x=log10(VIIRSBrightness+1),y=ScalarIlluminanceSiteCoV))+geom_point()+theme(text = element_text(size=25))+geom_smooth(method=glm, aes(fill=CoVLuminance))
+LPPlotZH+xlab(bquote("Log(VIIRS+1)"~log(nW/Sr/cm^2)))+ylab("CoV on SI within sites")
+cor.test(log10(FieldSQCMergeZH$VIIRSBrightness+1),FieldSQCMergeZH$ScalarIlluminanceSiteCoV)
+#
+LPPlotZH <- ggplot(FieldSQCMergeZH, aes(x=log10(SQA),y=ScalarIlluminanceSiteCoV))+geom_point()+theme(text = element_text(size=25))+geom_smooth(method=glm, aes(fill=CoVLuminance))
+LPPlotZH+xlab(bquote("Log(WAANSB)"~log(mcd/m^2)))+ylab("CoV on SI within sites")
+cor.test(log10(FieldSQCMergeZH$SQA),FieldSQCMergeZH$ScalarIlluminanceSiteCoV)
+
+#Plot coefficient of variation on luminance within images.
+LPPlotZH <- ggplot(FieldSQCMergeZH, aes(x=Clouds,y=CoVLuminance))+geom_point()+theme(text = element_text(size=25))+geom_smooth(method=glm, aes(fill=CoVLuminance))
+LPPlotZH+xlab("% Clouds")+ylab("CoV on Luminance")
+cor.test(FieldSQCMergeZH$Clouds,FieldSQCMergeZH$CoVLuminance)
+#
+LPPlotZH <- ggplot(FieldSQCMergeZH, aes(x=Horizon,y=CoVLuminance))+geom_point()+theme(text = element_text(size=25))+geom_smooth(method=glm, aes(fill=CoVLuminance))
+LPPlotZH+xlab("% Horizon")+ylab("CoV on Luminance")
+cor.test(FieldSQCMergeZH$Horizon,FieldSQCMergeZH$CoVLuminance)
