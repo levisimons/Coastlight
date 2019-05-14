@@ -1,287 +1,288 @@
 #Shell script to grab lidar files from https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/
 
-./20160520_11SKT27903799.laz
-./20160520_11SKT28053799.laz
-./20160520_11SKT28203799.laz
-./20160520_11SKT28203798.laz
-./20160520_11SKT28353798.laz
-./20160520_11SKT28353796.laz
-./20160520_11SKT28503796.laz
-./20160520_11SKT28503795.laz
-./20160520_11SKT28653795.laz
-./20160520_11SKT28653793.laz
-./20160520_11SKT28803795.laz
-./20160520_11SKT28803793.laz
-./20160520_11SKT28953795.laz
-./20160520_11SKT28953793.laz
-./20160520_11SKT28953790.laz
-./20160520_11SKT28953792.laz
-./20160520_11SKT29103793.laz
-./20160520_11SKT29103792.laz
-./20160520_11SKT29103790.laz
-./20160520_11SKT29103789.laz
-./20160520_11SKT29103787.laz
-./20160520_11SKT29103786.laz
-./20160520_11SKT29253787.laz
-./20160520_11SKT29253786.laz
-./20160520_11SKT29253784.laz
-./20160520_11SKT29253781.laz
-./20160520_11SKT29253783.laz
-./20160520_11SKT29403784.laz
-./20160520_11SKT29403783.laz
-./20160520_11SKT29403781.laz
-./20160520_11SKT29403780.laz
-./20160520_11SKT29553781.laz
-./20160520_11SKT29553780.laz
-./20160520_11SKT29703780.laz
-./20160520_11SKT29703778.laz
-./20160520_11SKT29853778.laz
-./20160520_11SKT29853777.laz
-./20160520_11SLT30003778.laz
-./20160520_11SLT30003777.laz
-./20160520_11SLT30003775.laz
-./20160520_11SLT30153777.laz
-./20160520_11SLT30153775.laz
-./20160520_11SLT30303775.laz
-./20160520_11SLT30303774.laz
-./20160520_11SLT30453774.laz
-./20160520_11SLT30603774.laz
-./20160520_11SLT30753774.laz
-./20160520_11SLT30753772.laz
-./20160520_11SLT30903774.laz
-./20160520_11SLT30903772.laz
-./20160520_11SLT31053772.laz
-./20160520_11SLT31203772.laz
-./20160520_11SLT31203771.laz
-./20160520_11SLT31353772.laz
-./20160520_11SLT31353771.laz
-./20160520_11SLT31503771.laz
-./20160520_11SLT31503769.laz
-./20160520_11SLT31653771.laz
-./20160520_11SLT31653769.laz
-./20160520_11SLT31803769.laz
-./20160520_11SLT31803768.laz
-./20160520_11SLT31953769.laz
-./20160520_11SLT31953768.laz
-./20160520_11SLT32103768.laz
-./20160520_11SLT32253768.laz
-./20160520_11SLT32403768.laz
-./20160520_11SLT32403766.laz
-./20160520_11SLT32553768.laz
-./20160520_11SLT32553766.laz
-./20160520_11SLT32703768.laz
-./20160520_11SLT32703766.laz
-./20160520_11SLT32853768.laz
-./20160520_11SLT32853766.laz
-./20160520_11SLT33003766.laz
-./20160520_11SLT33003765.laz
-./20160520_11SLT33153765.laz
-./20160520_11SLT33153763.laz
-./20160520_11SLT33303763.laz
-./20160520_11SLT33303765.laz
-./20160520_11SLT33453765.laz
-./20160520_11SLT33453763.laz
-./20160520_11SLT33453766.laz
-./20160520_11SLT33603766.laz
-./20160520_11SLT33603765.laz
-./20160520_11SLT33753766.laz
-./20160520_11SLT33753765.laz
-./20160520_11SLT33903766.laz
-./20160520_11SLT34053766.laz
-./20160520_11SLT34203766.laz
-./20160520_11SLT34353766.laz
-./20160520_11SLT34503766.laz
-./20160520_11SLT34503768.laz
-./20160520_11SLT34653768.laz
-./20160520_11SLT34653766.laz
-./20160520_11SLT34803768.laz
-./20160520_11SLT34803766.laz
-./20160520_11SLT34953766.laz
-./20160520_11SLT35103766.laz
-./20160520_11SLT35103768.laz
-./20160520_11SLT35253768.laz
-./20160520_11SLT35253766.laz
-./20160520_11SLT35403768.laz
-./20160520_11SLT35403766.laz
-./20160520_11SLT35553768.laz
-./20160520_11SLT35553766.laz
-./20160520_11SLT35703766.laz
-./20160520_11SLT35853766.laz
-./20160520_11SLT35853765.laz
-./20160520_11SLT36003765.laz
-./20160520_11SLT36003763.laz
-./20160520_11SLT36153765.laz
-./20160520_11SLT36153763.laz
-./20160520_11SLT36153762.laz
-./20160520_11SLT36303762.laz
-./20160520_11SLT36303760.laz
-./20160520_11SLT36303759.laz
-./20160520_11SLT36453760.laz
-./20160520_11SLT36453759.laz
-./20160520_11SLT36453757.laz
-./20160520_11SLT36603759.laz
-./20160520_11SLT36603757.laz
-./20160520_11SLT36603756.laz
-./20160520_11SLT36603754.laz
-./20160520_11SLT36603753.laz
-./20160520_11SLT36753754.laz
-./20160520_11SLT36753753.laz
-./20160520_11SLT36753738.laz
-./20160520_11SLT36753736.laz
-./20160520_11SLT36753751.laz
-./20160520_11SLT36753735.laz
-./20160520_11SLT36753750.laz
-./20160520_11SLT36753739.laz
-./20160520_11SLT36903751.laz
-./20160520_11SLT36903750.laz
-./20160520_11SLT36903748.laz
-./20160520_11SLT36753733.laz
-./20160520_11SLT36903739.laz
-./20160520_11SLT36903738.laz
-./20160520_11SLT36903736.laz
-./20160520_11SLT36903735.laz
-./20160520_11SLT36903733.laz
-./20160520_11SLT36903747.laz
-./20160520_11SLT36903741.laz
-./20160520_11SLT36903745.laz
-./20160520_11SLT37053747.laz
-./20160520_11SLT37053745.laz
-./20160520_11SLT37053744.laz
-./20160520_11SLT37053741.laz
-./20160520_11SLT37053739.laz
-./20160520_11SLT37053733.laz
-./20160520_11SLT37053742.laz
-./20160520_11SLT37203733.laz
-./20160520_11SLT37353733.laz
-./20160520_11SLT37353732.laz
-./20160520_11SLT37503732.laz
-./20160520_11SLT37503730.laz
-./20160520_11SLT37653732.laz
-./20160520_11SLT37653730.laz
-./20160520_11SLT37803730.laz
-./20160520_11SLT37953730.laz
-./20160520_11SLT37953729.laz
-./20160520_11SLT38103730.laz
-./20160520_11SLT38103729.laz
-./20160520_11SLT38103732.laz
-./20160520_11SLT38253732.laz
-./20160520_11SLT38253730.laz
-./20160520_11SLT38253729.laz
-./20160405_11SLT38403732.laz
-./20160520_11SLT38403730.laz
-./20160520_11SLT38403729.laz
-./20160405_11SLT38403733.laz
-./20160405_11SLT38553733.laz
-./20160405_11SLT38553732.laz
-./20160520_11SLT38553730.laz
-./20160405_11SLT38703733.laz
-./20160405_11SLT38703735.laz
-./20160520_11SLT38703730.laz
-./20160405_11SLT38703732.laz
-./20160405_11SLT38703736.laz
-./20160405_11SLT38853736.laz
-./20160405_11SLT38853735.laz
-./20160405_11SLT38853733.laz
-./20160405_11SLT38853732.laz
-./20160520_11SLT38853730.laz
-./20160405_11SLT39003736.laz
-./20160405_11SLT39003735.laz
-./20160405_11SLT39003733.laz
-./20160405_11SLT39003732.laz
-./20160520_11SLT39003730.laz
-./20160405_11SLT39153736.laz
-./20160405_11SLT39153735.laz
-./20160405_11SLT39153733.laz
-./20160520_11SLT39153732.laz
-./20160520_11SLT39153730.laz
-./20160405_11SLT39303736.laz
-./20160405_11SLT39303735.laz
-./20160405_11SLT39303733.laz
-./20160405_11SLT39303732.laz
-./20160520_11SLT39303730.laz
-./20160405_11SLT39453735.laz
-./20160405_11SLT39453733.laz
-./20160405_11SLT39453732.laz
-./20160520_11SLT39453730.laz
-./20160405_11SLT39603735.laz
-./20160405_11SLT39603733.laz
-./20160405_11SLT39603732.laz
-./20160405_11SLT39753733.laz
-./20160405_11SLT39753732.laz
-./20160405_11SLT39753730.laz
-./20160405_11SLT39903733.laz
-./20160405_11SLT39903732.laz
-./20160405_11SLT39903730.laz
-./20160405_11SMT40053732.laz
-./20160405_11SMT40053730.laz
-./20160405_11SMT40053729.laz
-./20160405_11SMT40203729.laz
-./20160405_11SMT40203727.laz
-./20160405_11SMT40353727.laz
-./20160405_11SMT40353726.laz
-./20160405_11SMT40503726.laz
-./20160405_11SMT40503724.laz
-./20160405_11SMT40653724.laz
-./20160405_11SMT40653723.laz
-./20160405_11SMT40803723.laz
-./20160405_11SMT40803721.laz
-./20160405_11SMT40953723.laz
-./20160405_11SMT40953721.laz
-./20160405_11SMT40953720.laz
-./20160405_11SMT41103721.laz
-./20160405_11SMT41103720.laz
-./20160405_11SMT41253720.laz
-./20160405_11SMT41253718.laz
-./20160405_11SMT41403718.laz
-./20160405_11SMT41403717.laz
-./20160405_11SMT41553718.laz
-./20160405_11SMT41553717.laz
-./20160405_11SMT41703717.laz
-./20160405_11SMT41703718.laz
-./20160405_11SMT41703715.laz
-./20160405_11SMT41853717.laz
-./20160405_11SMT41853715.laz
-./20160405_11SMT42003715.laz
-./20160405_11SMT42003714.laz
-./20160405_11SMT42153715.laz
-./20160405_11SMT42153714.laz
-./20160405_11SMT42303714.laz
-./20160405_11SMT42303712.laz
-./20160405_11SMT42453712.laz
-./20160405_11SMT42453711.laz
-./20160405_11SMT42603711.laz
-./20160405_11SMT42603709.laz
-./20160405_11SMT42753711.laz
-./20160405_11SMT42753709.laz
-./20160405_11SMT42753708.laz
-./20160405_11SMT42903709.laz
-./20160405_11SMT42903708.laz
-./20160405_11SMT42903706.laz
-./20160405_11SMT43053708.laz
-./20160405_11SMT43053706.laz
-./20160405_11SMT43053705.laz
-./20160405_11SMT43203705.laz
-./20160405_11SMT43203703.laz
-./20160405_11SMT43203702.laz
-./20160405_11SMT43353703.laz
-./20160405_11SMT43353702.laz
-./20160405_11SMT43353700.laz
-./20160405_11SMT43503702.laz
-./20160405_11SMT43503700.laz
-./20160405_11SMT43653702.laz
-./20160405_11SMT43653700.laz
-./20160405_11SMT43803702.laz
-./20160405_11SMT43803700.laz
-./20160405_11SMT43953700.laz
-./20160405_11SMS43953699.laz
-./20160405_11SMS44103699.laz
-./20160405_11SMS44103697.laz
-./20160405_11SMS44253697.laz
-./20160405_11SMS44253696.laz
-./20160405_11SMS44253694.laz
-./20160405_11SMS44403696.laz
-./20160405_11SMS44403694.laz
-./20160405_11SMS44403693.laz
-./20160405_11SMS44553693.laz
-./20160405_11SMS44553691.laz
-./20160405_11SMS44703693.laz
+
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SKT27903799.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SKT28053799.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SKT28203799.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SKT28203798.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SKT28353798.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SKT28353796.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SKT28503796.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SKT28503795.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SKT28653795.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SKT28653793.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SKT28803795.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SKT28803793.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SKT28953795.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SKT28953793.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SKT28953790.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SKT28953792.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SKT29103793.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SKT29103792.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SKT29103790.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SKT29103789.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SKT29103787.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SKT29103786.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SKT29253787.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SKT29253786.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SKT29253784.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SKT29253781.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SKT29253783.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SKT29403784.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SKT29403783.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SKT29403781.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SKT29403780.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SKT29553781.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SKT29553780.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SKT29703780.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SKT29703778.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SKT29853778.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SKT29853777.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT30003778.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT30003777.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT30003775.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT30153777.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT30153775.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT30303775.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT30303774.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT30453774.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT30603774.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT30753774.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT30753772.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT30903774.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT30903772.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT31053772.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT31203772.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT31203771.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT31353772.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT31353771.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT31503771.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT31503769.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT31653771.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT31653769.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT31803769.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT31803768.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT31953769.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT31953768.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT32103768.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT32253768.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT32403768.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT32403766.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT32553768.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT32553766.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT32703768.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT32703766.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT32853768.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT32853766.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT33003766.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT33003765.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT33153765.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT33153763.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT33303763.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT33303765.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT33453765.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT33453763.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT33453766.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT33603766.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT33603765.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT33753766.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT33753765.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT33903766.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT34053766.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT34203766.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT34353766.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT34503766.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT34503768.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT34653768.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT34653766.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT34803768.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT34803766.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT34953766.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT35103766.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT35103768.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT35253768.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT35253766.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT35403768.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT35403766.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT35553768.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT35553766.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT35703766.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT35853766.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT35853765.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT36003765.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT36003763.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT36153765.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT36153763.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT36153762.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT36303762.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT36303760.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT36303759.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT36453760.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT36453759.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT36453757.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT36603759.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT36603757.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT36603756.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT36603754.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT36603753.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT36753754.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT36753753.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT36753738.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT36753736.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT36753751.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT36753735.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT36753750.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT36753739.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT36903751.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT36903750.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT36903748.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT36753733.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT36903739.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT36903738.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT36903736.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT36903735.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT36903733.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT36903747.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT36903741.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT36903745.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT37053747.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT37053745.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT37053744.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT37053741.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT37053739.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT37053733.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT37053742.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT37203733.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT37353733.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT37353732.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT37503732.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT37503730.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT37653732.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT37653730.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT37803730.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT37953730.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT37953729.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT38103730.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT38103729.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT38103732.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT38253732.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT38253730.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT38253729.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SLT38403732.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT38403730.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT38403729.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SLT38403733.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SLT38553733.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SLT38553732.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT38553730.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SLT38703733.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SLT38703735.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT38703730.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SLT38703732.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SLT38703736.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SLT38853736.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SLT38853735.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SLT38853733.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SLT38853732.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT38853730.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SLT39003736.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SLT39003735.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SLT39003733.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SLT39003732.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT39003730.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SLT39153736.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SLT39153735.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SLT39153733.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT39153732.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT39153730.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SLT39303736.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SLT39303735.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SLT39303733.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SLT39303732.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT39303730.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SLT39453735.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SLT39453733.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SLT39453732.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SLT39453730.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SLT39603735.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SLT39603733.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SLT39603732.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SLT39753733.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SLT39753732.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SLT39753730.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SLT39903733.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SLT39903732.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SLT39903730.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SMT40053732.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SMT40053730.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SMT40053729.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SMT40203729.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SMT40203727.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SMT40353727.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SMT40353726.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SMT40503726.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SMT40503724.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SMT40653724.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SMT40653723.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SMT40803723.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SMT40803721.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SMT40953723.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SMT40953721.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SMT40953720.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SMT41103721.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SMT41103720.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SMT41253720.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SMT41253718.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SMT41403718.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SMT41403717.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SMT41553718.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SMT41553717.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SMT41703717.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SMT41703718.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SMT41703715.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SMT41853717.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SMT41853715.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SMT42003715.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SMT42003714.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SMT42153715.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SMT42153714.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SMT42303714.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SMT42303712.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SMT42453712.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SMT42453711.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SMT42603711.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SMT42603709.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SMT42753711.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SMT42753709.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SMT42753708.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SMT42903709.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SMT42903708.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SMT42903706.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SMT43053708.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SMT43053706.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SMT43053705.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SMT43203705.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SMT43203703.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SMT43203702.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SMT43353703.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SMT43353702.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SMT43353700.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SMT43503702.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SMT43503700.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SMT43653702.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SMT43653700.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SMT43803702.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SMT43803700.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SMT43953700.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SMS43953699.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SMS44103699.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SMS44103697.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SMS44253697.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SMS44253696.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SMS44253694.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SMS44403696.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SMS44403694.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SMS44403693.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SMS44553693.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SMS44553691.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
+wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160405_11SMS44703693.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
