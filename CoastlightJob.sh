@@ -5,3 +5,5 @@
 #SBATCH --mem=1200000m
 #SBATCH -pSCCWRP
 cd /home/cmb-07/sn1/alsimons/Coastlight
+gdalbuildvrt mergedCoast.vrt /home/cmb-07/sn1/alsimons/Coastlight/*_compressed.tif
+gdal_translate -of GTiff -a_nodata -999999 -co "COMPRESS=lzw" mergedCoast.vrt mergedCoast.tif
