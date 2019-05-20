@@ -1,5 +1,5 @@
 #Shell script to grab lidar files from https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/
-
+##Script defunct as lidar resolution is too low##
 
 wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SKT27903799.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
 wget https://coast.noaa.gov/htdata/lidar2_z/geoid12b/data/6259/20160520_11SKT28053799.laz ~/Desktop/Coastlight/SDM/CoastalDEM/ ;
