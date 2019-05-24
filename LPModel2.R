@@ -71,8 +71,8 @@ FieldSQCMergeZH <- left_join(FieldData,SQCDataZeroHorizon,by=c("SQCSiteName"="Lo
 #Edited-horizon merged data set
 FieldSQCMergeEH <- left_join(FieldData,SQCDataEditedHorizon,by=c("SQCSiteName"="Location"))
 #Determine the fraction of horizon radiance to full sky radiance.
-FieldSQCMergeZH$HorizonLuminance <- (FieldSQCMergeZH$ScalarIlluminance - FieldSQCMergeEH$ScalarIlluminance)
-FieldSQCMergeEH$HorizonLuminance <- (FieldSQCMergeZH$ScalarIlluminance - FieldSQCMergeEH$ScalarIlluminance)
+FieldSQCMergeZH$HorizonLuminance <- (FieldSQCMergeZH$ScalarIlluminance - FieldSQCMergeEH$ScalarIlluminance)/FieldSQCMergeZH$ScalarIlluminance
+FieldSQCMergeEH$HorizonLuminance <- (FieldSQCMergeZH$ScalarIlluminance - FieldSQCMergeEH$ScalarIlluminance)/FieldSQCMergeZH$ScalarIlluminance
 
 #Subset horizon-edited data for analysis of spatial variability of scalar illuminance.
 SpatialEH <- FieldSQCMergeEH
@@ -142,6 +142,9 @@ LPLogModelZH <- lm(log10(ScalarIlluminance)~log10(SQA),data=FieldSQCMergeZH)
 FieldSQCMergeZH$LogFit <- log10(FieldSQCMergeZH$SQA*LPLogModelZH$coefficients[2])+LPLogModelZH$coefficients[1]
 FieldSQCMergeZHSubset <- na.omit(FieldSQCMergeZH,cols=c("LogFit"))
 cor.test(log10(FieldSQCMergeZHSubset$ScalarIlluminance),log10(FieldSQCMergeZHSubset$SQA))
+#Log-log model summary.  Get the coefficients via 'summary and then test the correlation.
+summary(lm(log10(FieldSQCMergeZHSubset$ScalarIlluminance)~log10(FieldSQCMergeZHSubset$SQA)))
+cor.test(1.52065+log10(1.19760*FieldSQCMergeZHSubset$SQA),log10(FieldSQCMergeZHSubset$ScalarIlluminance))
 #Plot model
 LPPlotZH <- ggplot(FieldSQCMergeZHSubset, aes(x=log10(SQA),y=log10(ScalarIlluminance),color=`CCT (Scalar)`))+geom_point()+theme(text = element_text(size=25))+geom_smooth(method=glm, aes(fill=LogFit))
 LPPlotZH+xlab(bquote("Log(WAANSB)"~log(mcd/m^2)))+ylab("Log(SI (mlx))\nFull hemisphere")+scale_color_gradientn("CCT (K)",colours = rev(plasma(10)),limits=c(1500,5000))
@@ -229,7 +232,8 @@ LPPlotZH+xlab( bquote("Log(Ring 1 Luminance)"~log(mcd/m^2)))+ylab("Ring 1 CCT (K
 cor.test(FieldSQCMergeZHSubset$`Ring 1CCT`,log10(FieldSQCMergeZHSubset$`Ring 1Luminance`))
 mean(FieldSQCMergeZHSubset$`Ring 1CCT`)
 sd(FieldSQCMergeZHSubset$`Ring 1CCT`)
-mean(FieldSQCMergeZH[which(FieldSQCMergeZH$`Ring 1Luminance`>=0),c("Ring 1Luminance")])
+mean(FieldSQCMergeZHSubset[which(FieldSQCMergeZHSubset$`Ring 1Luminance`>=0),c("Ring 1Luminance")])
+mean((FieldSQCMergeZHSubset[which(FieldSQCMergeZHSubset$`Ring 1Luminance`>=0),c("Ring 1Luminance")])/(FieldSQCMergeZHSubset[which(FieldSQCMergeZHSubset$`Ring 1Luminance`>=0),c("Ring 3Luminance")]))
 sd(FieldSQCMergeZH[which(FieldSQCMergeZH$`Ring 1Luminance`>=0),c("Ring 1Luminance")])
 
 #Plot color temperature versus luminance for ring 7, the bottom 10 degrees of the sky.  Use full hemispheric images.
@@ -239,7 +243,8 @@ LPPlotZH+xlab( bquote("Log(Ring 7 Luminance)"~(mcd/m^2)))+ylab("Ring 7 CCT (K)")
 cor.test(FieldSQCMergeZHSubset$`Ring 7CCT`,log10(FieldSQCMergeZHSubset$`Ring 7Luminance`))
 mean(FieldSQCMergeZHSubset$`Ring 7CCT`)
 sd(FieldSQCMergeZHSubset$`Ring 7CCT`)
-mean(FieldSQCMergeZH[which(FieldSQCMergeZH$`Ring 7Luminance`>=0),c("Ring 7Luminance")])
+mean(FieldSQCMergeZHSubset[which(FieldSQCMergeZHSubset$`Ring 7Luminance`>=0),c("Ring 7Luminance")])
+mean((FieldSQCMergeZHSubset[which(FieldSQCMergeZHSubset$`Ring 7Luminance`>=0),c("Ring 7Luminance")])/(FieldSQCMergeZHSubset[which(FieldSQCMergeZHSubset$`Ring 7Luminance`>=0),c("Ring 3Luminance")]))
 sd(FieldSQCMergeZH[which(FieldSQCMergeZH$`Ring 7Luminance`>=0),c("Ring 7Luminance")])
 
 #Boxplot of luminance values for the top and bottom rings of the sky.
@@ -321,7 +326,7 @@ colnames(MapCoordinates)[which(names(MapCoordinates) == "Adjusted longitude")] <
 MapCoordinates <- MapCoordinates[!is.na(MapCoordinates$latitude) & !is.na(MapCoordinates$longitude),]
 CalMap = leaflet(MapCoordinates) %>% 
   addTiles()
-ColorScale <- colorNumeric(palette=plasma(10),domain=log10(FieldSQCMergeZH$SQA))
-CalMap %>% addCircleMarkers(color = ~ColorScale(log10(SQA)), fill = TRUE,radius=2,fillOpacity = 0.1) %>% 
+ColorScale <- colorNumeric(palette=plasma(10),domain=log10(FieldSQCMergeZH$VIIRSBrightness+1))
+CalMap %>% addCircleMarkers(color = ~ColorScale(log10(VIIRSBrightness+1)), fill = TRUE,radius=2,fillOpacity = 0.1) %>% 
   addProviderTiles(providers$Esri.WorldTopoMap) %>%
-  leaflet::addLegend(position="topright", pal=ColorScale,values=~log10(SQA),opacity=1,title="Log(WAANSB)<br>Log(mcd/m<sup>2</sup>)")
+  leaflet::addLegend(position="topright", pal=ColorScale,values=~log10(VIIRSBrightness+1),opacity=1,title="log(VIIRS+1)<br>log(nW/cm<sup>2</sup>/sr)")
