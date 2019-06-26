@@ -18,6 +18,8 @@ require(webshot)
 require(stats)
 require(segmented)
 require(viridis)
+require(lubridate)
+require(vegan)
 
 wd <- "~/Desktop/Coastlight"
 setwd(wd)
@@ -113,7 +115,25 @@ colnames(FieldSQCMergeEH)[which(names(FieldSQCMergeEH) == "ScalarIlluminance.x")
 colnames(FieldSQCMergeZH)[which(names(FieldSQCMergeZH) == "ScalarIlluminance.x")] <- "ScalarIlluminance"
 #Use the same %horizon values for both the full hemispheric and edited horizon images.
 FieldSQCMergeZH$Horizon <- FieldSQCMergeEH$Horizon
+FieldSQCMergeZH <- FieldSQCMergeZH[!duplicated(FieldSQCMergeZH),]
+FieldSQCMergeEH <- FieldSQCMergeEH[!duplicated(FieldSQCMergeEH),]
 FieldSQCMerge <- rbind(FieldSQCMergeZH,FieldSQCMergeEH)
+
+#Clear out duplicate columns.
+FieldSQCMerge$Date.y <- NULL
+FieldSQCMerge$Time.y <- NULL
+names(FieldSQCMerge)[names(FieldSQCMerge)=="Date.x"] <- "Date"
+names(FieldSQCMerge)[names(FieldSQCMerge)=="Time.x"] <- "Time"
+#Convert variable types for statistial analysis.
+FieldSQCMerge$SQCSiteName <- as.factor(FieldSQCMerge$SQCSiteName)
+FieldSQCMerge$UniqueID <- as.factor(FieldSQCMerge$UniqueID)
+FieldSQCMerge$TypeHorizon <- as.factor(FieldSQCMerge$TypeHorizon)
+#Calculate the number of days from the start of fieldwork.
+FieldSQCMerge$Days <- as.numeric(difftime(as.Date(FieldSQCMerge$Date,"%m/%d/%Y"),min(as.Date(FieldSQCMerge$Date,"%m/%d/%Y")),units="days"))
+
+#Check for variables which make a significant contribution to scalar illuminance.
+adonis(log10(ScalarIlluminance)~SQA+Days+`Sun Altitude`+`Air temp (C)`+`RH (%)`+Clouds+Horizon+HorizonLuminance, data=FieldSQCMerge[FieldSQCMerge$TypeHorizon=="ZeroHorizon",],permutations=1000,method="manhattan")
+adonis(log10(ScalarIlluminance)~SQA+Days+`Sun Altitude`+`Air temp (C)`+`RH (%)`+Clouds+Horizon+HorizonLuminance, data=FieldSQCMerge[FieldSQCMerge$TypeHorizon=="EditedHorizon",],permutations=1000,method="manhattan")
 
 #Compare models generated from full sky scalar illuminance, or the luminance from particular bands of the sky, using WAANSB and the input variable.
 #Try a logrithmic model of scalar illuminance versus VIIRS for the full data set for the full hemispheric images.
