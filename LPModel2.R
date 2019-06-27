@@ -132,8 +132,24 @@ FieldSQCMerge$TypeHorizon <- as.factor(FieldSQCMerge$TypeHorizon)
 FieldSQCMerge$Days <- as.numeric(difftime(as.Date(FieldSQCMerge$Date,"%m/%d/%Y"),min(as.Date(FieldSQCMerge$Date,"%m/%d/%Y")),units="days"))
 
 #Check for variables which make a significant contribution to scalar illuminance.
-adonis(log10(ScalarIlluminance)~SQA+Days+`Sun Altitude`+`Air temp (C)`+`RH (%)`+Clouds+Horizon+HorizonLuminance, data=FieldSQCMerge[FieldSQCMerge$TypeHorizon=="ZeroHorizon",],permutations=1000,method="manhattan")
-adonis(log10(ScalarIlluminance)~SQA+Days+`Sun Altitude`+`Air temp (C)`+`RH (%)`+Clouds+Horizon+HorizonLuminance, data=FieldSQCMerge[FieldSQCMerge$TypeHorizon=="EditedHorizon",],permutations=1000,method="manhattan")
+adonis(log10(ScalarIlluminance)~log10(SQA)+Days+`Sun Altitude`+`Air temp (C)`+`RH (%)`+Clouds+Horizon+HorizonLuminance, data=FieldSQCMerge[FieldSQCMerge$TypeHorizon=="ZeroHorizon",],permutations=1000,method="manhattan")
+adonis(log10(ScalarIlluminance)~log10(SQA)+Days+`Sun Altitude`+`Air temp (C)`+`RH (%)`+Clouds+Horizon+HorizonLuminance, data=FieldSQCMerge[FieldSQCMerge$TypeHorizon=="EditedHorizon",],permutations=1000,method="manhattan")
+#Build a linear model of the log of scalar illuminance from the remaining significant factors.
+LPLogModelZH <- lm(log10(ScalarIlluminance)~log10(SQA)+`Air temp (C)`+Clouds+Horizon,data=FieldSQCMerge[FieldSQCMerge$TypeHorizon=="ZeroHorizon",])
+FieldSQCMerge[FieldSQCMerge$TypeHorizon=="ZeroHorizon","LogFit"] <- LPLogModelZH$coefficients[1]+
+  LPLogModelZH$coefficients[2]*log10(FieldSQCMerge[FieldSQCMerge$TypeHorizon=="ZeroHorizon","SQA"])+
+  LPLogModelZH$coefficients[3]*FieldSQCMerge[FieldSQCMerge$TypeHorizon=="ZeroHorizon","Air temp (C)"]+
+  LPLogModelZH$coefficients[4]*FieldSQCMerge[FieldSQCMerge$TypeHorizon=="ZeroHorizon","Clouds"]+
+  LPLogModelZH$coefficients[3]*FieldSQCMerge[FieldSQCMerge$TypeHorizon=="ZeroHorizon","Horizon"]
+cor.test(log10(FieldSQCMerge[FieldSQCMerge$TypeHorizon=="ZeroHorizon","ScalarIlluminance"]),FieldSQCMerge[FieldSQCMerge$TypeHorizon=="ZeroHorizon","LogFit"])
+#
+LPLogModelEH <- lm(log10(ScalarIlluminance)~log10(SQA)+`Air temp (C)`+Clouds+Horizon,data=FieldSQCMerge[FieldSQCMerge$TypeHorizon=="EditedHorizon",])
+FieldSQCMerge[FieldSQCMerge$TypeHorizon=="EditedHorizon","LogFit"] <- LPLogModelEH$coefficients[1]+
+  LPLogModelEH$coefficients[2]*log10(FieldSQCMerge[FieldSQCMerge$TypeHorizon=="EditedHorizon","SQA"])+
+  LPLogModelEH$coefficients[3]*FieldSQCMerge[FieldSQCMerge$TypeHorizon=="EditedHorizon","Air temp (C)"]+
+  LPLogModelEH$coefficients[4]*FieldSQCMerge[FieldSQCMerge$TypeHorizon=="EditedHorizon","Clouds"]+
+  LPLogModelEH$coefficients[3]*FieldSQCMerge[FieldSQCMerge$TypeHorizon=="EditedHorizon","Horizon"]
+cor.test(log10(FieldSQCMerge[FieldSQCMerge$TypeHorizon=="EditedHorizon","ScalarIlluminance"]),FieldSQCMerge[FieldSQCMerge$TypeHorizon=="EditedHorizon","LogFit"])
 
 #Compare models generated from full sky scalar illuminance, or the luminance from particular bands of the sky, using WAANSB and the input variable.
 #Try a logrithmic model of scalar illuminance versus VIIRS for the full data set for the full hemispheric images.
