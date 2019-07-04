@@ -31,15 +31,26 @@ SQCData <- arrange(SQCData,`SQC File Name`)
 colnames(SQCData)[which(names(SQCData) == "Scalar Illuminance")] <- "ScalarIlluminance"
 
 #Calculate whole sky coefficient of variation in scalar illuminance
-SkySectors <- (SQCData[grepl("D(.*?)R(.*?)Luminance", names(SQCData))])
-SectorNames <- colnames(SkySectors)
-SkySectors[SkySectors<0] <- 0
-SkySectors$SDLuminance <- rowSds(as.matrix(SkySectors),na.rm=TRUE)
-SkySectors$MeanLuminance <- rowMeans(SkySectors[SectorNames],na.rm=TRUE)
-SkySectors$CoVLuminance <- SkySectors$SDLuminance/SkySectors$MeanLuminance
-SkySectors$`SQC File Name` <- SQCData$`SQC File Name`
-#Merge in these scalar illuminance statistics into the batch analyses data set.
-SQCData <- left_join(SQCData,SkySectors[,c("SQC File Name","MeanLuminance","SDLuminance","CoVLuminance")],by=c("SQC File Name"))
+SQCData[SQCData<0] <- NA
+SQCData$SDLuminance <- rowSds(as.matrix(SQCData[grepl("D(.*?)R(.*?)Luminance", names(SQCData))]),na.rm=TRUE)
+SQCData$MeanLuminance <- rowMeans(as.matrix(SQCData[grepl("D(.*?)R(.*?)Luminance", names(SQCData))]),na.rm=TRUE)
+SQCData$CoVLuminance <- SQCData$SDLuminance/SQCData$MeanLuminance
+#Calculate luminance statistics for the bottom band of the sky (0 - 11.54 degrees above the horizon).
+SQCData$SDLuminanceD1 <- rowSds(as.matrix(SQCData[grepl("D1R(.*?)Luminance", names(SQCData))]),na.rm=TRUE)
+SQCData$MeanLuminanceD1 <- rowMeans(as.matrix(SQCData[grepl("D1R(.*?)Luminance", names(SQCData))]),na.rm=TRUE)
+SQCData$CoVLuminanceD1 <- SQCData$SDLuminanceD1/SQCData$MeanLuminanceD1
+#Calculate luminance statistics for the top band of the sky (53.13 - 90 degrees above the horizon).
+SQCData$SDLuminanceD5 <- rowSds(as.matrix(SQCData[grepl("D5R(.*?)Luminance", names(SQCData))]),na.rm=TRUE)
+SQCData$MeanLuminanceD5 <- rowMeans(as.matrix(SQCData[grepl("D5R(.*?)Luminance", names(SQCData))]),na.rm=TRUE)
+SQCData$CoVLuminanceD5 <- SQCData$SDLuminanceD5/SQCData$MeanLuminanceD5
+#Estimate the mean color correlated temperature for the bottom band of the sky (0 - 11.54 degrees above the horizon).
+SQCData$CCTD1 <- rowMeans(as.matrix(SQCData[grepl("D1R(.*?)CCT", names(SQCData))]),na.rm=TRUE)
+#Estimate the mean color correlated temperature for the bottom band of the sky (53.13 - 90 degrees above the horizon).
+SQCData$CCTD5 <- rowMeans(as.matrix(SQCData[grepl("D5R(.*?)CCT", names(SQCData))]),na.rm=TRUE)
+#Convert NaN values to NA.
+SQCData[is.nan(as.matrix(SQCData))] <- NA
+FieldSQCMerge$MeanLuminanceD5[is.nan(FieldSQCMerge$MeanLuminanceD5)] <- NA
+FieldSQCMerge$MeanLuminanceD1[is.nan(FieldSQCMerge$MeanLuminanceD1)] <- NA
 
 #Read in 2012 VIIRS upwards radiance data per site.
 VIIRS <- read.table("LPPointsUnder150.csv", header=TRUE, sep=",",as.is=T,skip=0,fill=TRUE,check.names=FALSE)
@@ -131,45 +142,65 @@ FieldSQCMerge$TypeHorizon <- as.factor(FieldSQCMerge$TypeHorizon)
 #Calculate the number of days from the start of fieldwork.
 FieldSQCMerge$Days <- as.numeric(difftime(as.Date(FieldSQCMerge$Date,"%m/%d/%Y"),min(as.Date(FieldSQCMerge$Date,"%m/%d/%Y")),units="days"))
 
-#Check for variables which make a significant contribution to scalar illuminance.
-adonis(log10(ScalarIlluminance)~log10(SQA)+Days+`Sun Altitude`+`Air temp (C)`+`RH (%)`+Clouds+Horizon+HorizonLuminance, data=FieldSQCMerge[FieldSQCMerge$TypeHorizon=="ZeroHorizon",],permutations=1000,method="manhattan")
-adonis(log10(ScalarIlluminance)~log10(SQA)+Days+`Sun Altitude`+`Air temp (C)`+`RH (%)`+Clouds+Horizon+HorizonLuminance, data=FieldSQCMerge[FieldSQCMerge$TypeHorizon=="EditedHorizon",],permutations=1000,method="manhattan")
+#Check for variables which make a significant contribution to scalar illuminance.  Use VIIRS as the illumination variable.
+adonis(log10(ScalarIlluminance)~log10(VIIRSBrightness+1)+Days+`Sun Altitude`+`Air temp (C)`+`RH (%)`+Clouds+Horizon, data=FieldSQCMerge[FieldSQCMerge$TypeHorizon=="ZeroHorizon",],permutations=1000,method="manhattan")
+adonis(log10(ScalarIlluminance)~log10(VIIRSBrightness+1)+Days+`Sun Altitude`+`Air temp (C)`+`RH (%)`+Clouds+Horizon, data=FieldSQCMerge[FieldSQCMerge$TypeHorizon=="EditedHorizon",],permutations=1000,method="manhattan")
+
+#Check for variables which make a significant contribution to scalar illuminance.  Use the sky quality atlas as the illumination variable.
+adonis(log10(ScalarIlluminance)~log10(SQA)+Days+`Sun Altitude`+`Air temp (C)`+`RH (%)`+Clouds+Horizon, data=FieldSQCMerge[FieldSQCMerge$TypeHorizon=="ZeroHorizon",],permutations=1000,method="manhattan")
+adonis(log10(ScalarIlluminance)~log10(SQA)+Days+`Sun Altitude`+`Air temp (C)`+`RH (%)`+Clouds+Horizon, data=FieldSQCMerge[FieldSQCMerge$TypeHorizon=="EditedHorizon",],permutations=1000,method="manhattan")
+
+#Check for variables which make a significant contribution to variation on scalar illuminance within sites.  Use various measures of the nighttime environment.
+adonis(ScalarIlluminanceSiteCoV~log10(SQA)+log10(VIIRSBrightness+1)+log10(MeanLuminanceD1+1)+log10(MeanLuminanceD5+1)+Horizon, data=FieldSQCMerge[FieldSQCMerge$TypeHorizon=="ZeroHorizon" & !is.na(FieldSQCMerge$MeanLuminanceD5),],permutations=1000,method="manhattan")
+adonis(ScalarIlluminanceSiteCoV~log10(SQA)+log10(VIIRSBrightness+1)+log10(MeanLuminanceD1+1)+log10(MeanLuminanceD5+1)+Horizon, data=FieldSQCMerge[FieldSQCMerge$TypeHorizon=="EditedHorizon" & !is.na(FieldSQCMerge$MeanLuminanceD5),],permutations=1000,method="manhattan")
+
+#Check for variables which make a significant contribution to variation on luminance within 0 to 11.54 degees above the horizon.
+adonis(log10(MeanLuminanceD1 + 1)~log10(ScalarIlluminance)+log10(SQA)+log10(VIIRSBrightness+1)+Horizon, data=FieldSQCMerge[FieldSQCMerge$TypeHorizon=="ZeroHorizon",],permutations=1000,method="manhattan")
+adonis(log10(MeanLuminanceD1 + 1)~log10(ScalarIlluminance)+log10(SQA)+log10(VIIRSBrightness+1)+Horizon, data=FieldSQCMerge[FieldSQCMerge$TypeHorizon=="EditedHorizon",],permutations=1000,method="manhattan")
+
+#Check for variables which make a significant contribution to variation on luminance within 53.13 to 90 degees above the horizon.
+adonis(log10(MeanLuminanceD5 + 1)~log10(ScalarIlluminance)+log10(SQA)+log10(VIIRSBrightness+1)+Horizon, data=FieldSQCMerge[FieldSQCMerge$TypeHorizon=="ZeroHorizon" & !is.na(FieldSQCMerge$MeanLuminanceD5),],permutations=1000,method="manhattan")
+adonis(log10(MeanLuminanceD5 + 1)~log10(ScalarIlluminance)+log10(SQA)+log10(VIIRSBrightness+1)+Horizon, data=FieldSQCMerge[FieldSQCMerge$TypeHorizon=="EditedHorizon" & !is.na(FieldSQCMerge$MeanLuminanceD5),],permutations=1000,method="manhattan")
+
 #Build a linear model of the log of scalar illuminance from the remaining significant factors.
 LPLogModelZH <- lm(log10(ScalarIlluminance)~log10(SQA)+`Air temp (C)`+Clouds+Horizon,data=FieldSQCMerge[FieldSQCMerge$TypeHorizon=="ZeroHorizon",])
 FieldSQCMerge[FieldSQCMerge$TypeHorizon=="ZeroHorizon","LogFit"] <- LPLogModelZH$coefficients[1]+
   LPLogModelZH$coefficients[2]*log10(FieldSQCMerge[FieldSQCMerge$TypeHorizon=="ZeroHorizon","SQA"])+
   LPLogModelZH$coefficients[3]*FieldSQCMerge[FieldSQCMerge$TypeHorizon=="ZeroHorizon","Air temp (C)"]+
   LPLogModelZH$coefficients[4]*FieldSQCMerge[FieldSQCMerge$TypeHorizon=="ZeroHorizon","Clouds"]+
+  LPLogModelZH$coefficients[5]*FieldSQCMerge[FieldSQCMerge$TypeHorizon=="ZeroHorizon","Horizon"]
+cor.test(log10(FieldSQCMerge[FieldSQCMerge$TypeHorizon=="ZeroHorizon","ScalarIlluminance"]),FieldSQCMerge[FieldSQCMerge$TypeHorizon=="ZeroHorizon","LogFit"])
+#Build a linear model of the log of scalar illuminance from the remaining permanent significant factors.
+LPLogModelZH <- lm(log10(ScalarIlluminance)~log10(SQA)+Horizon,data=FieldSQCMerge[FieldSQCMerge$TypeHorizon=="ZeroHorizon",])
+FieldSQCMerge[FieldSQCMerge$TypeHorizon=="ZeroHorizon","LogFit"] <- LPLogModelZH$coefficients[1]+
+  LPLogModelZH$coefficients[2]*log10(FieldSQCMerge[FieldSQCMerge$TypeHorizon=="ZeroHorizon","SQA"])+
   LPLogModelZH$coefficients[3]*FieldSQCMerge[FieldSQCMerge$TypeHorizon=="ZeroHorizon","Horizon"]
 cor.test(log10(FieldSQCMerge[FieldSQCMerge$TypeHorizon=="ZeroHorizon","ScalarIlluminance"]),FieldSQCMerge[FieldSQCMerge$TypeHorizon=="ZeroHorizon","LogFit"])
-#
+# Calculate relative importance of remaining variables.
+calc.relimp(LPLogModelZH)
+
 LPLogModelEH <- lm(log10(ScalarIlluminance)~log10(SQA)+`Air temp (C)`+Clouds+Horizon,data=FieldSQCMerge[FieldSQCMerge$TypeHorizon=="EditedHorizon",])
 FieldSQCMerge[FieldSQCMerge$TypeHorizon=="EditedHorizon","LogFit"] <- LPLogModelEH$coefficients[1]+
   LPLogModelEH$coefficients[2]*log10(FieldSQCMerge[FieldSQCMerge$TypeHorizon=="EditedHorizon","SQA"])+
   LPLogModelEH$coefficients[3]*FieldSQCMerge[FieldSQCMerge$TypeHorizon=="EditedHorizon","Air temp (C)"]+
   LPLogModelEH$coefficients[4]*FieldSQCMerge[FieldSQCMerge$TypeHorizon=="EditedHorizon","Clouds"]+
+  LPLogModelEH$coefficients[5]*FieldSQCMerge[FieldSQCMerge$TypeHorizon=="EditedHorizon","Horizon"]
+cor.test(log10(FieldSQCMerge[FieldSQCMerge$TypeHorizon=="EditedHorizon","ScalarIlluminance"]),FieldSQCMerge[FieldSQCMerge$TypeHorizon=="EditedHorizon","LogFit"])
+#Build a linear model of the log of scalar illuminance from the remaining permanent significant factors.
+LPLogModelEH <- lm(log10(ScalarIlluminance)~log10(SQA)+Horizon,data=FieldSQCMerge[FieldSQCMerge$TypeHorizon=="EditedHorizon",])
+FieldSQCMerge[FieldSQCMerge$TypeHorizon=="EditedHorizon","LogFit"] <- LPLogModelEH$coefficients[1]+
+  LPLogModelEH$coefficients[2]*log10(FieldSQCMerge[FieldSQCMerge$TypeHorizon=="EditedHorizon","SQA"])+
   LPLogModelEH$coefficients[3]*FieldSQCMerge[FieldSQCMerge$TypeHorizon=="EditedHorizon","Horizon"]
 cor.test(log10(FieldSQCMerge[FieldSQCMerge$TypeHorizon=="EditedHorizon","ScalarIlluminance"]),FieldSQCMerge[FieldSQCMerge$TypeHorizon=="EditedHorizon","LogFit"])
+# Calculate relative importance of remaining variables.
+calc.relimp(LPLogModelEH)
 
-#Compare models generated from full sky scalar illuminance, or the luminance from particular bands of the sky, using WAANSB and the input variable.
-#Try a logrithmic model of scalar illuminance versus VIIRS for the full data set for the full hemispheric images.
-LPLogModelZH <- lm(log10(ScalarIlluminance)~log10(VIIRSBrightness+1),data=FieldSQCMergeZH)
-FieldSQCMergeZH$LogFit <- log10((FieldSQCMergeZH$VIIRSBrightness+1)*LPLogModelZH$coefficients[2])+LPLogModelZH$coefficients[1]
-FieldSQCMergeZHSubset <- na.omit(FieldSQCMergeZH,cols=c("LogFit"))
-cor.test(log10(FieldSQCMergeZHSubset$ScalarIlluminance),log10(FieldSQCMergeZHSubset$VIIRSBrightness+1))
-#Plot model
-LPPlotZH <- ggplot(FieldSQCMergeZHSubset, aes(x=log10(VIIRSBrightness+1),y=log10(ScalarIlluminance),color=`CCT (Scalar)`))+geom_point()+theme(text = element_text(size=25))+geom_smooth(method=glm, aes(fill=LogFit))
-LPPlotZH+xlab(bquote("Log(VIIRS+1)"~log(nW/Sr/cm^2)))+ylab("Log(SI (mlx))")+scale_color_gradientn("CCT (K)",colours = rev(plasma(10)),limits=c(1500,5000))
-
-#Try a logrithmic model of scalar illuminance versus VIIRS for the full data set for the full hemispheric images.
-FieldSQCMergeZHSubset <- subset(FieldSQCMergeZH,Clouds==0)
-LPLogModelZH <- lm(log10(ScalarIlluminance)~log10(VIIRSBrightness+1),data=FieldSQCMergeZHSubset)
-FieldSQCMergeZHSubset$LogFit <- log10((FieldSQCMergeZHSubset$VIIRSBrightness+1)*LPLogModelZH$coefficients[2])+LPLogModelZH$coefficients[1]
-FieldSQCMergeZHSubset <- na.omit(FieldSQCMergeZHSubset,cols=c("LogFit"))
-cor.test(log10(FieldSQCMergeZHSubset$ScalarIlluminance),log10(FieldSQCMergeZHSubset$VIIRSBrightness+1))
-#Plot model
-LPPlotZH <- ggplot(FieldSQCMergeZHSubset, aes(x=log10(VIIRSBrightness+1),y=log10(ScalarIlluminance),color=`CCT (Scalar)`))+geom_point()+theme(text = element_text(size=25))+geom_smooth(method=glm, aes(fill=LogFit))
-LPPlotZH+xlab(bquote("Log(VIIRS+1)"~log(nW/Sr/cm^2)))+ylab("Log(SI (mlx))")+scale_color_gradientn("CCT (K)",colours = rev(plasma(10)),limits=c(1500,5000))
+#Plot models of log SI versus measured log SI.
+LPPlotZH <- ggplot(FieldSQCMerge[FieldSQCMerge$TypeHorizon=="ZeroHorizon",], aes(x=log10(ScalarIlluminance),y=LogFit,color=`CCT (Scalar)`))+geom_point()+theme(text = element_text(size=25))+geom_smooth(method=glm, aes(fill=LogFit))
+LPPlotZH+xlab(expression(atop("Log(SI (mlx))","(Measured)")))+ylab(expression(atop("Log(SI (mlx))","(Modeled)")))+scale_color_gradientn("CCT (K)",colours = rev(plasma(10)),limits=c(1500,4500))
+#
+LPPlotEH <- ggplot(FieldSQCMerge[FieldSQCMerge$TypeHorizon=="EditedHorizon",], aes(x=log10(ScalarIlluminance),y=LogFit,color=`CCT (Scalar)`))+geom_point()+theme(text = element_text(size=25))+geom_smooth(method=glm, aes(fill=LogFit))
+LPPlotEH+xlab(expression(atop("Log(SI (mlx))","(Measured)")))+ylab(expression(atop("Log(SI (mlx))","(Modeled)")))+scale_color_gradientn("CCT (K)",colours = rev(plasma(10)),limits=c(1500,4500))
 
 #Compare models generated from full sky scalar illuminance, or the luminance from particular bands of the sky, using WAANSB and the input variable.
 
@@ -259,6 +290,20 @@ cor.test(FieldSQCMergeEHSubset$LogFit,FieldSQCMergeEHSubset$SQA)
 LPPlotEH <- ggplot(FieldSQCMergeEHSubset, aes(x=log10(SQA),y=log10(ScalarIlluminance),color=`CCT (Scalar)`))+geom_point()+theme(text = element_text(size=25))+geom_smooth(method=glm, aes(fill=LogFit))
 LPPlotEH+xlab(bquote("Log(WAANSB)"~log(mcd/m^2)))+ylab("Log(SI (mlx))\nEdited horizon")+scale_color_gradientn("CCT (K)",colours = rev(plasma(10)),limits=c(1500,5000))
 
+##Compare luminance within the top and bottom bands of the sky with measurements of the nighttime sky.
+cor.test(log10(FieldSQCMerge[FieldSQCMerge$TypeHorizon=="ZeroHorizon","MeanLuminanceD1"]+1),log10(FieldSQCMerge[FieldSQCMerge$TypeHorizon=="ZeroHorizon","ScalarIlluminance"]+1))
+cor.test(log10(FieldSQCMerge[FieldSQCMerge$TypeHorizon=="ZeroHorizon","MeanLuminanceD1"]+1),log10(FieldSQCMerge[FieldSQCMerge$TypeHorizon=="ZeroHorizon","SQA"]+1))
+cor.test(log10(FieldSQCMerge[FieldSQCMerge$TypeHorizon=="ZeroHorizon","MeanLuminanceD1"]+1),log10(FieldSQCMerge[FieldSQCMerge$TypeHorizon=="ZeroHorizon","VIIRSBrightness"]+1))
+cor.test(log10(FieldSQCMerge[FieldSQCMerge$TypeHorizon=="EditedHorizon","MeanLuminanceD1"]+1),log10(FieldSQCMerge[FieldSQCMerge$TypeHorizon=="EditedHorizon","ScalarIlluminance"]+1))
+cor.test(log10(FieldSQCMerge[FieldSQCMerge$TypeHorizon=="EditedHorizon","MeanLuminanceD1"]+1),log10(FieldSQCMerge[FieldSQCMerge$TypeHorizon=="EditedHorizon","SQA"]+1))
+cor.test(log10(FieldSQCMerge[FieldSQCMerge$TypeHorizon=="EditedHorizon","MeanLuminanceD1"]+1),log10(FieldSQCMerge[FieldSQCMerge$TypeHorizon=="EditedHorizon","VIIRSBrightness"]+1))
+cor.test(log10(FieldSQCMerge[FieldSQCMerge$TypeHorizon=="ZeroHorizon","MeanLuminanceD5"]+1),log10(FieldSQCMerge[FieldSQCMerge$TypeHorizon=="ZeroHorizon","ScalarIlluminance"]+1))
+cor.test(log10(FieldSQCMerge[FieldSQCMerge$TypeHorizon=="ZeroHorizon","MeanLuminanceD5"]+1),log10(FieldSQCMerge[FieldSQCMerge$TypeHorizon=="ZeroHorizon","SQA"]+1))
+cor.test(log10(FieldSQCMerge[FieldSQCMerge$TypeHorizon=="ZeroHorizon","MeanLuminanceD5"]+1),log10(FieldSQCMerge[FieldSQCMerge$TypeHorizon=="ZeroHorizon","VIIRSBrightness"]+1))
+cor.test(log10(FieldSQCMerge[FieldSQCMerge$TypeHorizon=="EditedHorizon","MeanLuminanceD5"]+1),log10(FieldSQCMerge[FieldSQCMerge$TypeHorizon=="EditedHorizon","ScalarIlluminance"]+1))
+cor.test(log10(FieldSQCMerge[FieldSQCMerge$TypeHorizon=="EditedHorizon","MeanLuminanceD5"]+1),log10(FieldSQCMerge[FieldSQCMerge$TypeHorizon=="EditedHorizon","SQA"]+1))
+cor.test(log10(FieldSQCMerge[FieldSQCMerge$TypeHorizon=="EditedHorizon","MeanLuminanceD5"]+1),log10(FieldSQCMerge[FieldSQCMerge$TypeHorizon=="EditedHorizon","VIIRSBrightness"]+1))
+
 ##Color temperature versus luminance for the top and bottom bands of the sky.
 
 #Plot color temperature versus luminance for ring 1, the top 30 degrees of the sky.  Use full hemispheric images.
@@ -284,43 +329,43 @@ mean((FieldSQCMergeZHSubset[which(FieldSQCMergeZHSubset$`Ring 7Luminance`>=0),c(
 sd(FieldSQCMergeZH[which(FieldSQCMergeZH$`Ring 7Luminance`>=0),c("Ring 7Luminance")])
 
 #Boxplot of luminance values for the top and bottom rings of the sky.
-tmp <- as.data.frame(FieldSQCMergeZH$`Ring 1Luminance`)
+tmp <- as.data.frame(FieldSQCMerge[FieldSQCMerge$TypeHorizon=="EditedHorizon","MeanLuminanceD5"])
 colnames(tmp) <- c("Luminance")
-tmp$Ring <- "Top 30°"
-tmp2 <- as.data.frame(FieldSQCMergeZH$`Ring 7Luminance`)
+tmp$Ring <- "51.13° to 90°"
+tmp2 <- as.data.frame(FieldSQCMerge[FieldSQCMerge$TypeHorizon=="EditedHorizon","MeanLuminanceD1"])
 colnames(tmp2) <- c("Luminance")
-tmp2$Ring <- "Bottom 10°"
+tmp2$Ring <- "0° to 11.54°"
 tmp <- rbind(tmp,tmp2)
 tmp <- na.omit(tmp)
 tmp <- tmp[!duplicated(tmp),]
 tmp <- subset(tmp,Luminance>=0)
 tmp$Ring <- as.factor(tmp$Ring)
 LPBoxPlot <- ggplot(tmp,aes(x=Ring,y=Luminance))+geom_boxplot()
-LPBoxPlot <- LPBoxPlot + scale_x_discrete(name = "Section of sky") + scale_y_continuous(name = bquote("L"~(mcd/m^2)))
+LPBoxPlot <- LPBoxPlot + scale_x_discrete(name = "Declination band of sky") + scale_y_continuous(name = bquote("Luminance"~(mcd/m^2)))
 LPBoxPlot <- LPBoxPlot  + theme(axis.text.x=element_text(colour="black", size = 25), axis.text.y=element_text(colour="black", size = 25),text=element_text(size = 25))
 LPBoxPlot
-mean(FieldSQCMergeZH[which(FieldSQCMergeZH$`Ring 1Luminance`>=0),c("Ring 1Luminance")])
-mean(FieldSQCMergeZH[which(FieldSQCMergeZH$`Ring 7Luminance`>=0),c("Ring 7Luminance")])
-wilcox.test(na.omit(FieldSQCMergeZH[which(FieldSQCMergeZH$`Ring 1Luminance`>=0),c("Ring 1Luminance")]),na.omit(FieldSQCMergeZH[which(FieldSQCMergeZH$`Ring 7Luminance`>=0),c("Ring 7Luminance")]),alternative="two.sided")
+mean(FieldSQCMerge[FieldSQCMerge$TypeHorizon=="ZeroHorizon","MeanLuminanceD1"])
+mean(FieldSQCMerge[FieldSQCMerge$TypeHorizon=="ZeroHorizon","MeanLuminanceD5"])
+wilcox.test(FieldSQCMerge[FieldSQCMerge$TypeHorizon=="EditedHorizon","MeanLuminanceD1"],FieldSQCMerge[FieldSQCMerge$TypeHorizon=="EditedHorizon","MeanLuminanceD5"],alternative="greater")
 
 #Boxplot of color temperature values for the top and bottom rings of the sky.
-tmp <- as.data.frame(FieldSQCMergeZH$`Ring 1CCT`)
+tmp <- as.data.frame(as.data.frame(FieldSQCMerge[FieldSQCMerge$TypeHorizon=="EditedHorizon","CCTD1"]))
 colnames(tmp) <- c("CCT")
-tmp$Ring <- "Top 30°"
-tmp2 <- as.data.frame(FieldSQCMergeZH$`Ring 7CCT`)
+tmp$Ring <- "0° to 11.54°"
+tmp2 <- as.data.frame(as.data.frame(FieldSQCMerge[FieldSQCMerge$TypeHorizon=="EditedHorizon","CCTD5"]))
 colnames(tmp2) <- c("CCT")
-tmp2$Ring <- "Bottom 10°"
+tmp2$Ring <- "51.13° to 90°"
 tmp <- rbind(tmp,tmp2)
 tmp <- na.omit(tmp)
 tmp <- tmp[!duplicated(tmp),]
 tmp$Ring <- as.factor(tmp$Ring)
 LPBoxPlot <- ggplot(tmp,aes(x=Ring,y=CCT))+geom_boxplot()
-LPBoxPlot <- LPBoxPlot + scale_x_discrete(name = "Section of sky") + scale_y_continuous(name = "CCT (K)")
+LPBoxPlot <- LPBoxPlot + scale_x_discrete(name = "Declination band of sky") + scale_y_continuous(name = "CCT (K)")
 LPBoxPlot <- LPBoxPlot  + theme(axis.text.x=element_text(colour="black", size = 25), axis.text.y=element_text(colour="black", size = 25),text=element_text(size = 25))
 LPBoxPlot
-mean(FieldSQCMergeZH[which(FieldSQCMergeZH$`Ring 1Luminance`>=0),c("Ring 1CCT")])
-mean(FieldSQCMergeZH[which(FieldSQCMergeZH$`Ring 7Luminance`>=0),c("Ring 7CCT")])
-wilcox.test(na.omit(FieldSQCMergeZH$`Ring 1CCT`),na.omit(FieldSQCMergeZH$`Ring 7CCT`),alternative="two.sided")
+mean(FieldSQCMerge[FieldSQCMerge$TypeHorizon=="EditedHorizon","CCTD1"])
+mean(FieldSQCMerge[FieldSQCMerge$TypeHorizon=="EditedHorizon","CCTD5"])
+wilcox.test(FieldSQCMerge[FieldSQCMerge$TypeHorizon=="EditedHorizon","CCTD1"],FieldSQCMerge[FieldSQCMerge$TypeHorizon=="EditedHorizon","CCTD5"],alternative="less")
 
 #Plot coefficient of variation on scalar illuminance within VIIRS pixels.
 LPPlotZH <- ggplot(FieldSQCMergeZH, aes(x=log10(VIIRSBrightness+1),y=ScalarIlluminanceSiteCoV))+geom_point()+theme(text = element_text(size=25))+geom_smooth(method=glm, aes(fill=CoVLuminance))
