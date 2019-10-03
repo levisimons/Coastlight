@@ -20,6 +20,7 @@ setwd(wd)
 species <- "Grunion"
 #species <- "Plover"
 
+#Set output file.  Send all screen output to this file.
 outputFile <- paste("SDMTest",species,".txt",sep="")
 sink(outputFile)
 
@@ -103,24 +104,19 @@ testpres$SoCalBeachTypeAligned <- factor(testpres$SoCalBeachTypeAligned,levels=1
 testbackgr$SoCalBeachTypeAligned <- factor(testbackgr$SoCalBeachTypeAligned,levels=1:6)
 
 #Random forest model
-#rf1 <- randomForest(factor(pa) ~ ., data=envtrain)
-#rf1 <- suppressWarnings(randomForest(pa ~ ., data=envtrain))
 rf1 <- suppressWarnings(tuneRF(envtrain[,2:9],envtrain[,1],plot=FALSE,doBest=TRUE))
 print(paste("Random forest variable importance",species,"data"))
-#varImp(rf1,scale=TRUE)
 importance(rf1)
-#
-#erf <- evaluate(testpres,testbackgr,rf1)
-erf <- suppressWarnings(evaluate(testpres,testbackgr,rf1))
 print(paste("Random forest model evaluation",species,"data"))
+erf <- suppressWarnings(evaluate(testpres,testbackgr,rf1))
 erf
 
-#GLM
+#Generalized linear model
 m1 <- glm(factor(pa) ~ ., data=envtrain,family = binomial(link = "logit"))
 print(paste("Generalized linear model variable importance",species,"data"))
 varImp(m1,scale=TRUE)
-em1 <- suppressWarnings(evaluate(testpres,testbackgr,m1))
 print(paste("Generalized linear model evaluation",species,"data"))
+em1 <- suppressWarnings(evaluate(testpres,testbackgr,m1))
 em1
 
 #MaxEnt model
@@ -129,10 +125,20 @@ xm <- maxent(x=env.data,p=obs.data,a=backgr,factors='SoCalBeachTypeAligned')
 MaxentOutput <- var.importance(xm)
 print(paste("Maximum entropy model variable importance",species,"data"))
 MaxentOutput
-#xmEval <- evaluate(pres_test,backgr_test,xm,env.data)
-xmEval <- suppressWarnings(evaluate(testpres,testbackgr,xm))
 print(paste("Maximum entropy model evaluation",species,"data"))
+xmEval <- suppressWarnings(evaluate(testpres,testbackgr,xm))
 xmEval
 
 sink()
 #
+write.table(MaxentOutput,"MaxentOutput.txt",quote=FALSE,sep="\t",row.names = FALSE)
+#Save model graphs
+pdf("MaxentResponsePlot.pdf")
+response(xm)
+dev.off()
+pdf("MaxentResponseContributions.pdf")
+plot(xm)
+dev.off()
+
+#Further investigations of the Maxent model using ENMevaluate
+XMeval <- ENMevaluate(obs.data, env.data, backgr, method='randomkfold', kfolds=5, RMvalues=c(1,2), fc=c('L','LP'), parallel=FALSE, algorithm='maxent.jar',rasterPreds=FALSE,categoricals="SoCalBeachTypeAligned")
