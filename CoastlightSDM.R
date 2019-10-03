@@ -110,6 +110,9 @@ importance(rf1)
 print(paste("Random forest model evaluation",species,"data"))
 erf <- suppressWarnings(evaluate(testpres,testbackgr,rf1))
 erf
+print(paste("Significance of correlation:",suppressWarnings(erf@pcor)))
+print(paste("Significance of AUC:",suppressWarnings(erf@pauc)))
+print(paste("Maximum Cohen's kappa score for model:",max(erf@kappa)))
 
 #Generalized linear model
 m1 <- glm(factor(pa) ~ ., data=envtrain,family = binomial(link = "logit"))
@@ -118,6 +121,9 @@ varImp(m1,scale=TRUE)
 print(paste("Generalized linear model evaluation",species,"data"))
 em1 <- suppressWarnings(evaluate(testpres,testbackgr,m1))
 em1
+print(paste("Significance of correlation:",suppressWarnings(em1@pcor)))
+print(paste("Significance of AUC:",suppressWarnings(em1@pauc)))
+print(paste("Maximum Cohen's kappa score for model:",max(em1@kappa)))
 
 #MaxEnt model
 maxent()
@@ -128,17 +134,8 @@ MaxentOutput
 print(paste("Maximum entropy model evaluation",species,"data"))
 xmEval <- suppressWarnings(evaluate(testpres,testbackgr,xm))
 xmEval
+print(paste("Significance of correlation:",suppressWarnings(xmEval@pcor)))
+print(paste("Significance of AUC:",suppressWarnings(xmEval@pauc)))
+print(paste("Maximum Cohen's kappa score for model:",max(xmEval@kappa)))
 
 sink()
-#
-write.table(MaxentOutput,"MaxentOutput.txt",quote=FALSE,sep="\t",row.names = FALSE)
-#Save model graphs
-pdf("MaxentResponsePlot.pdf")
-response(xm)
-dev.off()
-pdf("MaxentResponseContributions.pdf")
-plot(xm)
-dev.off()
-
-#Further investigations of the Maxent model using ENMevaluate
-XMeval <- ENMevaluate(obs.data, env.data, backgr, method='randomkfold', kfolds=5, RMvalues=c(1,2), fc=c('L','LP'), parallel=FALSE, algorithm='maxent.jar',rasterPreds=FALSE,categoricals="SoCalBeachTypeAligned")
