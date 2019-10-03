@@ -1,3 +1,4 @@
+rm(list=ls())
 require(sp)
 require(raster)
 require(maptools)
@@ -7,16 +8,33 @@ require(rJava)
 require(arm)
 require(dplyr)
 require(sf)
+require(ENMeval)
+require(randomForest)
+require(caret)
 
 #wd <- "~/Desktop/Coastlight/SDM"
 wd <- "/home/cmb-07/sn1/alsimons/Coastlight"
 setwd(wd)
 
-# Read in grunion observation points.
-obs.data <- read.csv(file="RandomGrunionPoints.csv")
+#Set species type for observation data.
+species <- "Grunion"
+#species <- "Plover"
+
+outputFile <- paste("SDMTest",species,".txt",sep="")
+sink(outputFile)
+
+# Read in grunion or plover observation points.
+if(species=="Grunion"){
+  obs.data <- read.csv(file="RandomGrunionPointsWGS84.csv")
+}
+if(species=="Plover"){
+  obs.data <- read.csv(file="RandomPloverPointsWGS84.csv")
+}
+
 # Drop unused column
 obs.data <- obs.data[, c("xcoord", "ycoord")]
-obs.data <- sample_n(obs.data,500)
+set.seed(0)
+#obs.data <- sample_n(obs.data,200)
 
 # Read in environmental map layers.
 env.files <- list.files(pattern="Aligned.tif$",full.names=TRUE)
@@ -42,9 +60,7 @@ presvals <- presvals[, !names(presvals) %in% c("xcoord","ycoord")]
 
 # setting random seed to always create the same
 # random set of points for this example
-set.seed(0)
 #Create a random point cloud for pseudo-absences.
-#backgr <- randomPoints(mask=env.data,n=100*nrow(presvals),p=presvals,ext=extent(env.data),extf=1,excludep=TRUE,tryf=300)
 coastalArea <- read_sf("DEM2mBoundaryCleaned.shp",quiet=TRUE)
 backgr <- as.data.frame(st_coordinates(st_sample(x=coastalArea,size=50*nrow(obs.data),type="random",exact=TRUE)))
 absvals <- extract(env.data, backgr)
@@ -57,13 +73,12 @@ colnames(backgr) <- c("xcoord","ycoord")
 print(paste("Number of presence points:",nrow(obs.data),"Number of background points:",nrow(backgr)))
 absvals <- absvals[, !names(absvals) %in% c("X","Y")]
 
-#absvals <- absvals[, !names(absvals) %in% c("xcoord","ycoord","SoCalBeachTypeAligned","SoCalBeachWidthAligned")]
 #Merge pseudo-absences with true presences.
 pb <- c(rep(1, nrow(presvals)), rep(0, nrow(absvals)))
 sdmdata <- data.frame(cbind(pb, rbind(presvals, absvals)))
 
 #Drop factor-type environmental data layers for some of the downstream models.
-sdmdata[,"SoCalBeachTypeAligned"] <- as.factor(sdmdata[,"SoCalBeachTypeAligned"])
+sdmdata[,"SoCalBeachTypeAligned"] <- factor(sdmdata[,"SoCalBeachTypeAligned"],levels=1:6)
 pred_nf <- dropLayer(env.data,"SoCalBeachTypeAligned")
 
 #Construct a training and testing set for the presence data.
@@ -76,35 +91,48 @@ group <- kfold(backgr,5)
 backgr_train <- backgr[group!=1,]
 backgr_test <- backgr[group==1,]
 
+#Construct presence / pseudo-absence training sets.
+train <- rbind(pres_train,backgr_train)
+pb_train <- c(rep(1, nrow(pres_train)), rep(0, nrow(backgr_train)))
+envtrain <- extract(env.data,train)
+envtrain <- data.frame(cbind(pa=pb_train,envtrain))
+envtrain$SoCalBeachTypeAligned <- factor(envtrain$SoCalBeachTypeAligned,levels=1:6)
+testpres <- data.frame(extract(env.data,pres_test))
+testbackgr <- data.frame(extract(env.data,backgr_test))
+testpres$SoCalBeachTypeAligned <- factor(testpres$SoCalBeachTypeAligned,levels=1:6)
+testbackgr$SoCalBeachTypeAligned <- factor(testbackgr$SoCalBeachTypeAligned,levels=1:6)
+
+#Random forest model
+#rf1 <- randomForest(factor(pa) ~ ., data=envtrain)
+#rf1 <- suppressWarnings(randomForest(pa ~ ., data=envtrain))
+rf1 <- suppressWarnings(tuneRF(envtrain[,2:9],envtrain[,1],plot=FALSE,doBest=TRUE))
+print(paste("Random forest variable importance",species,"data"))
+#varImp(rf1,scale=TRUE)
+importance(rf1)
+#
+#erf <- evaluate(testpres,testbackgr,rf1)
+erf <- suppressWarnings(evaluate(testpres,testbackgr,rf1))
+print(paste("Random forest model evaluation",species,"data"))
+erf
+
 #GLM
-#m1 <- glm(pb ~ ., data=sdmdata,family = binomial(link = "logit"))
-#summary(m1)
-
-m2 <- bayesglm(pb ~. , data=sdmdata,family = binomial(link = "logit"), prior.scale = 2.5, maxit = 10000)
-summary(m2)
-
-#BioClim model
-#bc <- bioclim(pred_nf,pres_train)
-#e <- evaluate(pres_test,backgr_test,bc,pred_nf)
-#print("BioClim model")
-#e
-
-#Domain model
-#dm <- domain(pred_nf,pres_train)
-#e <- evaluate(pres_test,backgr_test,dm,pred_nf)
-#print("Domain model")
-#e
-
-#Mahalanobis distance model
-#mm <- mahal(pred_nf, pres_train)
-#e <- evaluate(pres_test, backgr_test, mm, pred_nf)
-#print("Mahalanobis model")
-#e
+m1 <- glm(factor(pa) ~ ., data=envtrain,family = binomial(link = "logit"))
+print(paste("Generalized linear model variable importance",species,"data"))
+varImp(m1,scale=TRUE)
+em1 <- suppressWarnings(evaluate(testpres,testbackgr,m1))
+print(paste("Generalized linear model evaluation",species,"data"))
+em1
 
 #MaxEnt model
 maxent()
 xm <- maxent(x=env.data,p=obs.data,a=backgr,factors='SoCalBeachTypeAligned')
-MaxentOutput <- as.data.frame(xm@results)
-MaxentOutput$Parameter <- rownames(MaxentOutput)
-colnames(MaxentOutput) <- c("Value","Parameter")
-write.table(MaxentOutput,"MaxentOutput.txt",quote=FALSE,sep="\t",row.names = FALSE)
+MaxentOutput <- var.importance(xm)
+print(paste("Maximum entropy model variable importance",species,"data"))
+MaxentOutput
+#xmEval <- evaluate(pres_test,backgr_test,xm,env.data)
+xmEval <- suppressWarnings(evaluate(testpres,testbackgr,xm))
+print(paste("Maximum entropy model evaluation",species,"data"))
+xmEval
+
+sink()
+#
