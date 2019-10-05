@@ -12,7 +12,7 @@ require(ENMeval)
 require(randomForest)
 require(caret)
 
-#wd <- "~/Desktop/Coastlight/SDM"
+wd <- "~/Desktop/Coastlight/SDM"
 wd <- "/home/cmb-07/sn1/alsimons/Coastlight"
 setwd(wd)
 
@@ -35,7 +35,7 @@ if(species=="Plover"){
 # Drop unused column
 obs.data <- obs.data[, c("xcoord", "ycoord")]
 set.seed(0)
-#obs.data <- sample_n(obs.data,200)
+obs.data <- sample_n(obs.data,25)
 
 # Read in environmental map layers.
 env.files <- list.files(pattern="Aligned.tif$",full.names=TRUE)
@@ -113,6 +113,19 @@ erf
 print(paste("Significance of correlation:",suppressWarnings(erf@pcor)))
 print(paste("Significance of AUC:",suppressWarnings(erf@pauc)))
 print(paste("Maximum Cohen's kappa score for model:",max(erf@kappa)))
+#Variable response functions for random forest model.
+dev.off()
+pdf(paste("RandomForestResponse",species,".pdf",sep=""))
+par(mfrow=c(2,4))
+partialPlot(rf1,envtrain,"DEM2mRasterAligned",col="red",xlab="Elevation (m)",ylab="predicted value",main="",add=FALSE)
+partialPlot(rf1,envtrain,"DistanceToFreshwaterClipAligned",col="red",xlab="Distance to freshwater (m)",ylab="predicted value",main="",add=FALSE)
+partialPlot(rf1,envtrain,"DistanceToSaltwaterClipAligned",col="red",xlab="Distance to saltwater (m)",ylab="predicted value",main="",add=FALSE)
+partialPlot(rf1,envtrain,"LogSIAligned",col="red",xlab="Log(SI) log(mlx)",ylab="predicted value",main="",add=FALSE)
+partialPlot(rf1,envtrain,"Slope2mRasterAligned",col="red",xlab="Slope (%)",ylab="predicted value",main="",add=FALSE)
+partialPlot(rf1,envtrain,"SoCalBeachTypeAligned",xlab="Beach category",ylab="predicted value",main="",add=FALSE)
+partialPlot(rf1,envtrain,"SoCalBeachWidthAligned",col="red",xlab="Beach width (m)",ylab="predicted value",main="",add=FALSE)
+partialPlot(rf1,envtrain,"SVF2mAligned",xlab="SVF",col="red",ylab="predicted value",main="",add=FALSE)
+dev.off()
 
 #Generalized linear model
 m1 <- glm(factor(pa) ~ ., data=envtrain,family = binomial(link = "logit"))
@@ -124,6 +137,8 @@ em1
 print(paste("Significance of correlation:",suppressWarnings(em1@pcor)))
 print(paste("Significance of AUC:",suppressWarnings(em1@pauc)))
 print(paste("Maximum Cohen's kappa score for model:",max(em1@kappa)))
+print("Variable coefficients generalized linear model.")
+m1
 
 #MaxEnt model
 maxent()
@@ -137,5 +152,11 @@ xmEval
 print(paste("Significance of correlation:",suppressWarnings(xmEval@pcor)))
 print(paste("Significance of AUC:",suppressWarnings(xmEval@pauc)))
 print(paste("Maximum Cohen's kappa score for model:",max(xmEval@kappa)))
+#Variable response functions for Maxent model.
+dev.off()
+pdf(paste("MaxentResponsePlot",species,".pdf",sep=""))
+response(xm,expand=0,range="p")
+dev.off()
 
 sink()
+#
