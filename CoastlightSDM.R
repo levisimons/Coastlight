@@ -12,7 +12,7 @@ require(ENMeval)
 require(randomForest)
 require(caret)
 
-wd <- "~/Desktop/Coastlight/SDM"
+#wd <- "~/Desktop/Coastlight/SDM"
 wd <- "/home/cmb-07/sn1/alsimons/Coastlight"
 setwd(wd)
 
@@ -27,18 +27,24 @@ sink(outputFile)
 # Read in grunion or plover observation points.
 if(species=="Grunion"){
   obs.data <- read.csv(file="RandomGrunionPointsWGS84.csv")
+  # Read in environmental map layers.
+  env.files <- list.files(pattern="Aligned.tif$",full.names=TRUE)
+  env.files <- env.files[env.files != "./DEM2mRasterAligned.tif" & env.files != "./DistanceToSaltwaterClipAligned.tif"]
 }
 if(species=="Plover"){
   obs.data <- read.csv(file="RandomPloverPointsWGS84.csv")
+  # Read in environmental map layers.
+  env.files <- list.files(pattern="Aligned.tif$",full.names=TRUE)
 }
 
 # Drop unused column
 obs.data <- obs.data[, c("xcoord", "ycoord")]
 set.seed(0)
-obs.data <- sample_n(obs.data,25)
+#obs.data <- sample_n(obs.data,25)
 
 # Read in environmental map layers.
-env.files <- list.files(pattern="Aligned.tif$",full.names=TRUE)
+#env.files <- list.files(pattern="Aligned.tif$",full.names=TRUE)
+# Make map stack of environmental layers.
 env.data <- stack(c(env.files))
 # Initialize data containing environmental layer values at presence data locations.
 presvals <- obs.data
@@ -159,4 +165,3 @@ response(xm,expand=0,range="p")
 dev.off()
 
 sink()
-#
