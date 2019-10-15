@@ -120,6 +120,10 @@ erf
 print(paste("Significance of correlation:",suppressWarnings(erf@pcor)))
 print(paste("Significance of AUC:",suppressWarnings(erf@pauc)))
 print(paste("Maximum Cohen's kappa score for model:",max(erf@kappa)))
+# Calculate Yule's Q.
+tmp <- erf@OR
+tmp[!is.finite(tmp)] <- NA 
+print(paste("Yule's Q score:",(max(tmp,na.rm=1)-1)/(max(tmp,na.rm=1)+1)))
 #Variable response functions for random forest model.
 if(species=="Grunion"){
   dev.off()
@@ -160,6 +164,10 @@ em1
 print(paste("Significance of correlation:",suppressWarnings(em1@pcor)))
 print(paste("Significance of AUC:",suppressWarnings(em1@pauc)))
 print(paste("Maximum Cohen's kappa score for model:",max(em1@kappa)))
+# Calculate Yule's Q.
+tmp <- em1@OR
+tmp[!is.finite(tmp)] <- NA 
+print(paste("Yule's Q score:",(max(tmp,na.rm=1)-1)/(max(tmp,na.rm=1)+1)))
 print("Variable coefficients generalized linear model.")
 m1
 
@@ -175,6 +183,10 @@ xmEval
 print(paste("Significance of correlation:",suppressWarnings(xmEval@pcor)))
 print(paste("Significance of AUC:",suppressWarnings(xmEval@pauc)))
 print(paste("Maximum Cohen's kappa score for model:",max(xmEval@kappa)))
+# Calculate Yule's Q.
+tmp <- xmEval@OR
+tmp[!is.finite(tmp)] <- NA 
+print(paste("Yule's Q score:",(max(tmp,na.rm=1)-1)/(max(tmp,na.rm=1)+1)))
 #Variable response functions for Maxent model.
 if(species=="Grunion"){
   dev.off()
