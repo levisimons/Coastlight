@@ -14,6 +14,7 @@ require(randomForest)
 require(caret)
 require(pdp)
 require(ggplot2)
+require(cowplot)
 
 #wd <- "~/Desktop/Coastlight/SDM"
 wd <- "/home/cmb-07/sn1/alsimons/Coastlight"
@@ -142,7 +143,7 @@ for(i in 1:3){
   tmp <- erf@OR
   tmp[!is.finite(tmp)] <- NA 
   RFEvaluation$Q <- (max(tmp,na.rm=T)-1)/(max(tmp,na.rm=T)+1)
-  RFEvaluation$TSS <- max(erf@TPR,na.rm=T)+max(erf@TNR,na.rm=T)-1
+  RFEvaluation$TSS <- mean(erf@TPR,na.rm=T)+mean(erf@TNR,na.rm=T)-1
   RFEvaluationTotal <- rbind(RFEvaluationTotal,RFEvaluation)
   #Store partial response curve for random forest model.
   if(species=="Grunion"){
@@ -183,9 +184,13 @@ for(i in 1:3){
   }
   
   #Generalized linear model
-  m1 <- glm(pa ~ ., data=envtrain[,-c(2,3)],family = binomial(link = "logit"))
-  GLMImportance <- varImp(m1,scale=TRUE)
+  m1 <- glm(pa ~ .-1, data=envtrain[,-c(2,3)],family = binomial(link = "logit"))
+  #Determine the variable relative importance using the absolute value of the z-statistic.
+  tmp <- summary(m1)
+  GLMImportance <- as.data.frame(tmp$coefficients)
+  GLMImportance <- abs(GLMImportance)
   GLMImportance <- data.frame(names=row.names(GLMImportance),GLMImportance)
+  GLMImportance <- GLMImportance[,c(1,4)]
   GLMImportanceTotal <- rbind(GLMImportanceTotal,GLMImportance)
   em1 <- suppressWarnings(evaluate(testpres,testbackgr,m1))
   GLMEvaluation <- data.frame(matrix(nrow=1,ncol=5))
@@ -197,7 +202,7 @@ for(i in 1:3){
   tmp <- em1@OR
   tmp[!is.finite(tmp)] <- NA 
   GLMEvaluation$Q <- (max(tmp,na.rm=T)-1)/(max(tmp,na.rm=T)+1)
-  GLMEvaluation$TSS <- max(em1@TPR,na.rm=T)+max(em1@TNR,na.rm=T)-1
+  GLMEvaluation$TSS <- mean(em1@TPR,na.rm=T)+mean(em1@TNR,na.rm=T)-1
   GLMEvaluationTotal <- rbind(GLMEvaluationTotal,GLMEvaluation)
   #Store partial response curve for generalized linear model.
   #Note that raw outputs are logit units.  To convert to observation probabilities:
@@ -255,7 +260,7 @@ for(i in 1:3){
   tmp <- exm@OR
   tmp[!is.finite(tmp)] <- NA 
   XMEvaluation$Q <- (max(tmp,na.rm=T)-1)/(max(tmp,na.rm=T)+1)
-  XMEvaluation$TSS <- max(exm@TPR,na.rm=T)+max(exm@TNR,na.rm=T)-1
+  XMEvaluation$TSS <- mean(exm@TPR,na.rm=T)+mean(exm@TNR,na.rm=T)-1
   XMEvaluationTotal <- rbind(XMEvaluationTotal,XMEvaluation)
   #Store the variable response functions for Maxent model.
   if(species=="Grunion"){
@@ -302,25 +307,163 @@ tmpMean <- RFImportanceTotal %>% group_by(names) %>% summarise_all(funs(mean(Inc
 tmpSD <- RFImportanceTotal %>% group_by(names) %>% summarise_all(funs(sd(IncNodePurity)))
 RFImportanceTotal <- left_join(tmpMean,tmpSD,by=c("names"))
 colnames(RFImportanceTotal) <- c("Variable","MeanIncNodePurity","SDIncNodePurity")
-RFImportanceTotal
+#To save aggregated data frame.
+write.table(RFImportanceTotal,paste(species,"RFImportance.txt",sep=""),quote=FALSE,sep="\t",row.names = FALSE)
 tmpMean <- colMeans(RFEvaluationTotal)
 tmpSD <- apply(RFEvaluationTotal,2,sd)
 RFEvaluationTotal <- as.data.frame(rbind(tmpMean,tmpSD))
-RFEvaluationTotal
+#To save aggregated data frame.
+write.table(RFEvaluationTotal,paste(species,"RFEvaluation.txt",sep=""),quote=FALSE,sep="\t",row.names = TRUE)
 #GLM summary statistics
-tmpMean <- GLMImportanceTotal %>% group_by(names) %>% summarise_all(funs(mean(Overall)))
-tmpSD <- GLMImportanceTotal %>% group_by(names) %>% summarise_all(funs(sd(Overall)))
+tmpMean <- GLMImportanceTotal %>% group_by(names) %>% summarise_all(funs(mean(z.value)))
+tmpSD <- GLMImportanceTotal %>% group_by(names) %>% summarise_all(funs(sd(z.value)))
 GLMImportanceTotal <- left_join(tmpMean,tmpSD,by=c("names"))
 colnames(GLMImportanceTotal) <- c("Variable","MeanImportance","SDImportance")
+#To save aggregated data frame.
+write.table(GLMImportanceTotal,paste(species,"GLMImportance.txt",sep=""),quote=FALSE,sep="\t",row.names = FALSE)
 tmpMean <- colMeans(GLMEvaluationTotal)
 tmpSD <- apply(GLMEvaluationTotal,2,sd)
 GLMEvaluationTotal <- as.data.frame(rbind(tmpMean,tmpSD))
+#To save aggregated data frame.
+write.table(GLMEvalutionTotal,paste(species,"GLMEvaluation.txt",sep=""),quote=FALSE,sep="\t",row.names = TRUE)
 #Maxent summary statistics
 tmpMean <- XMImportanceTotal %>% group_by(variable) %>% summarise_all(funs(mean(permutation.importance)))
 tmpSD <- XMImportanceTotal %>% group_by(variable) %>% summarise_all(funs(sd(permutation.importance)))
 XMImportanceTotal <- left_join(tmpMean,tmpSD,by=c("variable"))
 colnames(XMImportanceTotal) <- c("Variable","MeanImportance","SDImportance")
+#To save aggregated data frame.
+write.table(XMImportanceTotal,paste(species,"XMImportance.txt",sep=""),quote=FALSE,sep="\t",row.names = FALSE)
 tmpMean <- colMeans(XMEvaluationTotal)
 tmpSD <- apply(XMEvaluationTotal,2,sd)
 XMEvaluationTotal <- as.data.frame(rbind(tmpMean,tmpSD))
+#To save aggregated data frame.
+write.table(XMEvaluationTotal,paste(species,"XMEvaluation.txt",sep=""),quote=FALSE,sep="\t",row.names = TRUE)
 
+#Partial dependence plots for the random forest model
+if(species=="Plover"){
+  RFp1Plot <- ggplot(RFp1Total, aes(x=DEM10mAligned,y=yhat))+geom_point()+theme(text = element_text(size=25))+geom_smooth(method=loess, aes(fill=yhat))
+  RFp1Plot <- RFp1Plot+xlab("Elevation (m)")+ylab("Detection\nProbability")
+  RFp2Plot <- ggplot(RFp2Total, aes(x=Freshwater10mAligned,y=yhat))+geom_point()+theme(text = element_text(size=25))+geom_smooth(method=loess, aes(fill=yhat))
+  RFp2Plot <- RFp2Plot+xlab("Distance to freshwater (m)")+ylab("Detection\nProbability")
+  RFp3Plot <- ggplot(RFp3Total, aes(x=Saltwater10mAligned,y=yhat))+geom_point()+theme(text = element_text(size=25))+geom_smooth(method=loess, aes(fill=yhat))
+  RFp3Plot <- RFp3Plot+xlab("Distance to saltwater (m)")+ylab("Detection\nProbability")
+  RFp4Plot <- ggplot(RFp4Total, aes(x=LogSI10mAligned,y=yhat))+geom_point()+theme(text = element_text(size=25))+geom_smooth(method=loess, aes(fill=yhat))
+  RFp4Plot <- RFp4Plot+xlab("Log(SI) log(mlx)")+ylab("Detection\nProbability")
+  RFp5Plot <- ggplot(RFp5Total, aes(x=Slope10mAligned,y=yhat))+geom_point()+theme(text = element_text(size=25))+geom_smooth(method=loess, aes(fill=yhat))
+  RFp5Plot <- RFp5Plot+xlab("Slope (%)")+ylab("Detection\nProbability")
+  RFp6Plot <- ggplot(RFp6Total, aes(x=SoCalBeachType10mAligned,y=yhat))+geom_point()+theme(text = element_text(size=25))+geom_boxplot(notch=FALSE)
+  RFp6Plot <- RFp6Plot+xlab("Beach category")+ylab("Detection\nProbability")
+  RFp7Plot <- ggplot(RFp7Total, aes(x=SoCalBeachWidth10mAligned,y=yhat))+geom_point()+theme(text = element_text(size=25))+geom_smooth(method=loess, aes(fill=yhat))
+  RFp7Plot <- RFp7Plot+xlab("Beach width (m)")+ylab("Detection\nProbability")
+  RFp8Plot <- ggplot(RFp8Total, aes(x=SVF10mAligned,y=yhat))+geom_point()+theme(text = element_text(size=25))+geom_smooth(method=loess, aes(fill=yhat))
+  RFp8Plot <- RFp8Plot+xlab("SVF")+ylab("Detection\nProbability")
+  RFPlots <- plot_grid(RFp1Plot,RFp2Plot,RFp3Plot,RFp4Plot,RFp5Plot,RFp6Plot,RFp7Plot,RFp8Plot,ncol=2,labels="AUTO")
+}
+if(species=="Grunion"){
+  #RFp1Plot <- ggplot(RFp1Total, aes(x=DEM10mAligned,y=yhat))+geom_point()+theme(text = element_text(size=25))+geom_smooth(method=loess, aes(fill=yhat))
+  #RFp1Plot <- RFp1Plot+xlab("Elevation (m)")+ylab("Detection\nProbability")
+  RFp2Plot <- ggplot(RFp2Total, aes(x=Freshwater10mAligned,y=yhat))+geom_point()+theme(text = element_text(size=25))+geom_smooth(method=loess, aes(fill=yhat))
+  RFp2Plot <- RFp2Plot+xlab("Distance to freshwater (m)")+ylab("Detection\nProbability")
+  #RFp3Plot <- ggplot(RFp3Total, aes(x=Saltwater10mAligned,y=yhat))+geom_point()+theme(text = element_text(size=25))+geom_smooth(method=loess, aes(fill=yhat))
+  #RFp3Plot <- RFp3Plot+xlab("Distance to saltwater (m)")+ylab("Detection\nProbability")
+  RFp4Plot <- ggplot(RFp4Total, aes(x=LogSI10mAligned,y=yhat))+geom_point()+theme(text = element_text(size=25))+geom_smooth(method=loess, aes(fill=yhat))
+  RFp4Plot <- RFp4Plot+xlab("Log(SI) log(mlx)")+ylab("Detection\nProbability")
+  RFp5Plot <- ggplot(RFp5Total, aes(x=Slope10mAligned,y=yhat))+geom_point()+theme(text = element_text(size=25))+geom_smooth(method=loess, aes(fill=yhat))
+  RFp5Plot <- RFp5Plot+xlab("Slope (%)")+ylab("Detection\nProbability")
+  RFp6Plot <- ggplot(RFp6Total, aes(x=SoCalBeachType10mAligned,y=yhat))+geom_point()+theme(text = element_text(size=25))+geom_boxplot(notch=FALSE)
+  RFp6Plot <- RFp6Plot+xlab("Beach category")+ylab("Detection\nProbability")
+  RFp7Plot <- ggplot(RFp7Total, aes(x=SoCalBeachWidth10mAligned,y=yhat))+geom_point()+theme(text = element_text(size=25))+geom_smooth(method=loess, aes(fill=yhat))
+  RFp7Plot <- RFp7Plot+xlab("Beach width (m)")+ylab("Detection\nProbability")
+  RFp8Plot <- ggplot(RFp8Total, aes(x=SVF10mAligned,y=yhat))+geom_point()+theme(text = element_text(size=25))+geom_smooth(method=loess, aes(fill=yhat))
+  RFp8Plot <- RFp8Plot+xlab("SVF")+ylab("Detection\nProbability")
+  RFPlots <- plot_grid(RFp2Plot,RFp4Plot,RFp5Plot,RFp6Plot,RFp7Plot,RFp8Plot,ncol=2,labels="AUTO")
+}
+png(paste(species,"RFPlots.png",sep=""),width=2*400,height=200*length(env.files))
+RFPlots
+dev.off()
+
+#Partial dependence plots for the GLM model
+if(species=="Plover"){
+  GLMp1Plot <- ggplot(GLMp1Total, aes(x=DEM10mAligned,y=exp(yhat)/(1+exp(yhat))))+geom_point()+theme(text = element_text(size=25))+geom_smooth(method=loess, aes(fill=yhat))
+  GLMp1Plot <- GLMp1Plot+xlab("Elevation (m)")+ylab("Detection\nProbability")
+  GLMp2Plot <- ggplot(GLMp2Total, aes(x=Freshwater10mAligned,y=exp(yhat)/(1+exp(yhat))))+geom_point()+theme(text = element_text(size=25))+geom_smooth(method=loess, aes(fill=yhat))
+  GLMp2Plot <- GLMp2Plot+xlab("Distance to freshwater (m)")+ylab("Detection\nProbability")
+  GLMp3Plot <- ggplot(GLMp3Total, aes(x=Saltwater10mAligned,y=exp(yhat)/(1+exp(yhat))))+geom_point()+theme(text = element_text(size=25))+geom_smooth(method=loess, aes(fill=yhat))
+  GLMp3Plot <- GLMp3Plot+xlab("Distance to saltwater (m)")+ylab("Detection\nProbability")
+  GLMp4Plot <- ggplot(GLMp4Total, aes(x=LogSI10mAligned,y=exp(yhat)/(1+exp(yhat))))+geom_point()+theme(text = element_text(size=25))+geom_smooth(method=loess, aes(fill=yhat))
+  GLMp4Plot <- GLMp4Plot+xlab("Log(SI) log(mlx)")+ylab("Detection\nProbability")
+  GLMp5Plot <- ggplot(GLMp5Total, aes(x=Slope10mAligned,y=exp(yhat)/(1+exp(yhat))))+geom_point()+theme(text = element_text(size=25))+geom_smooth(method=loess, aes(fill=yhat))
+  GLMp5Plot <- GLMp5Plot+xlab("Slope (%)")+ylab("Detection\nProbability")
+  GLMp6Plot <- ggplot(GLMp6Total, aes(x=SoCalBeachType10mAligned,y=exp(yhat)/(1+exp(yhat))))+geom_point()+theme(text = element_text(size=25))+geom_boxplot(notch=FALSE)
+  GLMp6Plot <- GLMp6Plot+xlab("Beach category")+ylab("Detection\nProbability")
+  GLMp7Plot <- ggplot(GLMp7Total, aes(x=SoCalBeachWidth10mAligned,y=exp(yhat)/(1+exp(yhat))))+geom_point()+theme(text = element_text(size=25))+geom_smooth(method=loess, aes(fill=yhat))
+  GLMp7Plot <- GLMp7Plot+xlab("Beach width (m)")+ylab("Detection\nProbability")
+  GLMp8Plot <- ggplot(GLMp8Total, aes(x=SVF10mAligned,y=exp(yhat)/(1+exp(yhat))))+geom_point()+theme(text = element_text(size=25))+geom_smooth(method=loess, aes(fill=yhat))
+  GLMp8Plot <- GLMp8Plot+xlab("SVF")+ylab("Detection\nProbability")
+  GLMPlots <- plot_grid(GLMp1Plot,GLMp2Plot,GLMp3Plot,GLMp4Plot,GLMp5Plot,GLMp6Plot,GLMp7Plot,GLMp8Plot,ncol=2,labels="AUTO")
+}
+if(species=="Grunion"){
+  #GLMp1Plot <- ggplot(GLMp1Total, aes(x=DEM10mAligned,y=exp(yhat)/(1+exp(yhat))))+geom_point()+theme(text = element_text(size=25))+geom_smooth(method=loess, aes(fill=yhat))
+  #GLMp1Plot <- GLMp1Plot+xlab("Elevation (m)")+ylab("Detection\nProbability")
+  GLMp2Plot <- ggplot(GLMp2Total, aes(x=Freshwater10mAligned,y=exp(yhat)/(1+exp(yhat))))+geom_point()+theme(text = element_text(size=25))+geom_smooth(method=loess, aes(fill=yhat))
+  GLMp2Plot <- GLMp2Plot+xlab("Distance to freshwater (m)")+ylab("Detection\nProbability")
+  #GLMp3Plot <- ggplot(GLMp3Total, aes(x=Saltwater10mAligned,y=exp(yhat)/(1+exp(yhat))))+geom_point()+theme(text = element_text(size=25))+geom_smooth(method=loess, aes(fill=yhat))
+  #GLMp3Plot <- GLMp3Plot+xlab("Distance to saltwater (m)")+ylab("Detection\nProbability")
+  GLMp4Plot <- ggplot(GLMp4Total, aes(x=LogSI10mAligned,y=exp(yhat)/(1+exp(yhat))))+geom_point()+theme(text = element_text(size=25))+geom_smooth(method=loess, aes(fill=yhat))
+  GLMp4Plot <- GLMp4Plot+xlab("Log(SI) log(mlx)")+ylab("Detection\nProbability")
+  GLMp5Plot <- ggplot(GLMp5Total, aes(x=Slope10mAligned,y=exp(yhat)/(1+exp(yhat))))+geom_point()+theme(text = element_text(size=25))+geom_smooth(method=loess, aes(fill=yhat))
+  GLMp5Plot <- GLMp5Plot+xlab("Slope (%)")+ylab("Detection\nProbability")
+  GLMp6Plot <- ggplot(GLMp6Total, aes(x=SoCalBeachType10mAligned,y=exp(yhat)/(1+exp(yhat))))+geom_point()+theme(text = element_text(size=25))+geom_boxplot(notch=FALSE)
+  GLMp6Plot <- GLMp6Plot+xlab("Beach category")+ylab("Detection\nProbability")
+  GLMp7Plot <- ggplot(GLMp7Total, aes(x=SoCalBeachWidth10mAligned,y=exp(yhat)/(1+exp(yhat))))+geom_point()+theme(text = element_text(size=25))+geom_smooth(method=loess, aes(fill=yhat))
+  GLMp7Plot <- GLMp7Plot+xlab("Beach width (m)")+ylab("Detection\nProbability")
+  GLMp8Plot <- ggplot(GLMp8Total, aes(x=SVF10mAligned,y=exp(yhat)/(1+exp(yhat))))+geom_point()+theme(text = element_text(size=25))+geom_smooth(method=loess, aes(fill=yhat))
+  GLMp8Plot <- GLMp8Plot+xlab("SVF")+ylab("Detection\nProbability")
+  GLMPlots <- plot_grid(GLMp2Plot,GLMp4Plot,GLMp5Plot,GLMp6Plot,GLMp7Plot,GLMp8Plot,ncol=2,labels="AUTO")
+}
+png(paste(species,"GLMPlots.png",sep=""),width=2*400,height=200*length(env.files))
+GLMPlots
+dev.off()
+
+#Partial dependence plots for the Maxent model
+if(species=="Plover"){
+  XMp1Plot <- ggplot(XMp1Total, aes(x=V1,y=p))+geom_point()+theme(text = element_text(size=25))+geom_smooth(method=loess, aes(fill=p))
+  XMp1Plot <- XMp1Plot+xlab("Elevation (m)")+ylab("Detection\nProbability")
+  XMp2Plot <- ggplot(XMp2Total, aes(x=V1,y=p))+geom_point()+theme(text = element_text(size=25))+geom_smooth(method=loess, aes(fill=p))
+  XMp2Plot <- XMp2Plot+xlab("Distance to freshwater (m)")+ylab("Detection\nProbability")
+  XMp3Plot <- ggplot(XMp3Total, aes(x=V1,y=p))+geom_point()+theme(text = element_text(size=25))+geom_smooth(method=loess, aes(fill=p))
+  XMp3Plot <- XMp3Plot+xlab("Distance to saltwater (m)")+ylab("Detection\nProbability")
+  XMp4Plot <- ggplot(XMp4Total, aes(x=V1,y=p))+geom_point()+theme(text = element_text(size=25))+geom_smooth(method=loess, aes(fill=p))
+  XMp4Plot <- XMp4Plot+xlab("Log(SI) log(mlx)")+ylab("Detection\nProbability")
+  XMp5Plot <- ggplot(XMp5Total, aes(x=V1,y=p))+geom_point()+theme(text = element_text(size=25))+geom_smooth(method=loess, aes(fill=p))
+  XMp5Plot <- XMp5Plot+xlab("Slope (%)")+ylab("Detection\nProbability")
+  XMp6Plot <- ggplot(XMp6Total, aes(x=as.factor(V1),y=p))+geom_point()+theme(text = element_text(size=25))+geom_boxplot(notch=FALSE)
+  XMp6Plot <- XMp6Plot+xlab("Beach category")+ylab("Detection\nProbability")
+  XMp7Plot <- ggplot(XMp7Total, aes(x=V1,y=p))+geom_point()+theme(text = element_text(size=25))+geom_smooth(method=loess, aes(fill=p))
+  XMp7Plot <- XMp7Plot+xlab("Beach width (m)")+ylab("Detection\nProbability")
+  XMp8Plot <- ggplot(XMp8Total, aes(x=V1,y=p))+geom_point()+theme(text = element_text(size=25))+geom_smooth(method=loess, aes(fill=p))
+  XMp8Plot <- XMp8Plot+xlab("SVF")+ylab("Detection\nProbability")
+  XMPlots <- plot_grid(XMp1Plot,XMp2Plot,XMp3Plot,XMp4Plot,XMp5Plot,XMp6Plot,XMp7Plot,XMp8Plot,ncol=2,labels="AUTO")
+}
+if(species=="Grunion"){
+  #XMp1Plot <- ggplot(XMp1Total, aes(x=V1,y=p))+geom_point()+theme(text = element_text(size=25))+geom_smooth(method=loess, aes(fill=p))
+  #XMp1Plot <- XMp1Plot+xlab("Elevation (m)")+ylab("Detection\nProbability")
+  XMp2Plot <- ggplot(XMp2Total, aes(x=V1,y=p))+geom_point()+theme(text = element_text(size=25))+geom_smooth(method=loess, aes(fill=p))
+  XMp2Plot <- XMp2Plot+xlab("Distance to freshwater (m)")+ylab("Detection\nProbability")
+  #XMp3Plot <- ggplot(XMp3Total, aes(x=V1,y=p))+geom_point()+theme(text = element_text(size=25))+geom_smooth(method=loess, aes(fill=p))
+  #XMp3Plot <- XMp3Plot+xlab("Distance to saltwater (m)")+ylab("Detection\nProbability")
+  XMp4Plot <- ggplot(XMp4Total, aes(x=V1,y=p))+geom_point()+theme(text = element_text(size=25))+geom_smooth(method=loess, aes(fill=p))
+  XMp4Plot <- XMp4Plot+xlab("Log(SI) log(mlx)")+ylab("Detection\nProbability")
+  XMp5Plot <- ggplot(XMp5Total, aes(x=V1,y=p))+geom_point()+theme(text = element_text(size=25))+geom_smooth(method=loess, aes(fill=p))
+  XMp5Plot <- XMp5Plot+xlab("Slope (%)")+ylab("Detection\nProbability")
+  XMp6Plot <- ggplot(XMp6Total, aes(x=as.factor(V1),y=p))+geom_point()+theme(text = element_text(size=25))+geom_boxplot(notch=FALSE)
+  XMp6Plot <- XMp6Plot+xlab("Beach category")+ylab("Detection\nProbability")
+  XMp7Plot <- ggplot(XMp7Total, aes(x=V1,y=p))+geom_point()+theme(text = element_text(size=25))+geom_smooth(method=loess, aes(fill=p))
+  XMp7Plot <- XMp7Plot+xlab("Beach width (m)")+ylab("Detection\nProbability")
+  XMp8Plot <- ggplot(XMp8Total, aes(x=V1,y=p))+geom_point()+theme(text = element_text(size=25))+geom_smooth(method=loess, aes(fill=p))
+  XMp8Plot <- XMp8Plot+xlab("SVF")+ylab("Detection\nProbability")
+  XMPlots <- plot_grid(XMp2Plot,XMp4Plot,XMp5Plot,XMp6Plot,XMp7Plot,XMp8Plot,ncol=2,labels="AUTO")
+}
+png(paste(species,"XMPlots.png",sep=""),width=2*400,height=200*length(env.files))
+XMPlots
+dev.off()
