@@ -30,7 +30,7 @@ setwd(wd)
 ##This part is to be run first to determine variables to keep for parsimonious random forest models
 #Set species types for observation data.
 #Set number of model iterations
-modelNum <- 3
+modelNum <- 100
 speciesList <- c("Grunion","Plover")
 for(species in speciesList){
   # Read in grunion or plover presence and pseudo-absence points.
@@ -78,7 +78,7 @@ for(species in speciesList){
   
   #Intialize summary statistics variables
   RFImportanceTotal <- data.frame()
-  for(i in 1:modelNums){
+  for(i in 1:modelNum){
     #Subsample presence and pseudo-absence points for training and testing sets for SDMs.
     sample_Num <- 100
     presSubset <- presvals
@@ -129,20 +129,23 @@ for(species in speciesList){
 speciesList <- c("Grunion","Plover")
 for(species in speciesList){
   #Select the variables to include in the parsimonious random forest model.
-  RFImportanceTotal <- read.table(paste(species,"ParsimonyRFImportance.txt",sep=""), header=TRUE, sep="\t",as.is=T,skip=0,fill=TRUE,quote="",check.names=FALSE, encoding = "UTF-8")
-  RFVars <- RFImportanceTotal[RFImportanceTotal$Freq==100,c("Variable")]
+  # Read in environmental map layers.
+  env.files <- list.files(pattern="10mAligned.tif$",full.names=TRUE)
+  #
   # Read in grunion or plover presence and pseudo-absence points.
   if(species=="Grunion"){
     obs.data <- read.csv(file="RandomGrunionPointsWGS84.csv")
     abs.data <- read.csv(file="RandomGrunionAbsencesWGS84.csv")
+    RFVars <- c("LogSI10mAligned","SoCalBeachWidth10mAligned")
+    env.files <- env.files[grep(paste(RFVars,collapse="|"),env.files)]
   }
   if(species=="Plover"){
     obs.data <- read.csv(file="RandomPloverPointsWGS84.csv")
     abs.data <- read.csv(file="RandomPloverAbsencesWGS84.csv")
+    RFVars <- c("Freshwater10mAligned","LogSI10mAligned","SoCalBeachWidth10mAligned")
+    env.files <- env.files[grep(paste(RFVars,collapse="|"),env.files)]
   }
-  # Read in environmental map layers.
-  env.files <- list.files(pattern="10mAligned.tif$",full.names=TRUE)
-  env.files <- env.files[grep(paste(RFVars,collapse="|"),env.files)]
+  
   # Drop unused columns
   obs.data <- obs.data[, c("xcoord", "ycoord")]
   abs.data <- abs.data[, c("xcoord", "ycoord")]
