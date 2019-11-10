@@ -17,9 +17,13 @@ require(ggplot2)
 require(cowplot)
 require(splines)
 
+#To deal with functions with the same name in tidyr
+.rs.unloadPackage("tidyr")
+#To deal with java issues
 .jinit()
 
-wd <- getwd()
+#wd <- "/home/cmb-07/sn1/alsimons/Coastlight"
+wd <- "~/Desktop/Coastlight/SDM"
 setwd(wd)
 
 #Set species types for observation data.
@@ -100,7 +104,7 @@ for(species in speciesList){
   XMp7Total <- data.frame()
   XMp8Total <- data.frame()
   set.seed(1)
-  for(i in 1:100){
+  for(i in 1:3){
     #Subsample presence and pseudo-absence points for training and testing sets for SDMs.
     sample_Num <- 100
     presSubset <- presvals
@@ -305,8 +309,6 @@ for(species in speciesList){
     }
   }
   #Random forest summary statistics
-  #tmpMean <- RFImportanceTotal %>% group_by(names) %>% summarise_all(funs(mean(IncNodePurity)))
-  #tmpSD <- RFImportanceTotal %>% group_by(names) %>% summarise_all(funs(sd(IncNodePurity)))
   RFImportanceTotal <- ddply(RFImportanceTotal, .(names), summarize,  MeanIncNodePurity=mean(IncNodePurity), SDIncNodePurity=sd(IncNodePurity))
   #RFImportanceTotal <- left_join(tmpMean,tmpSD,by=c("names"))
   colnames(RFImportanceTotal) <- c("Variable","MeanIncNodePurity","SDIncNodePurity")
@@ -319,8 +321,6 @@ for(species in speciesList){
   write.table(RFEvaluationTotal,paste(species,"RFEvaluation.txt",sep=""),quote=FALSE,sep="\t",row.names = TRUE)
   
   #GLM summary statistics
-  #tmpMean <- GLMImportanceTotal %>% group_by(names) %>% summarise_all(funs(mean(z.value)))
-  #tmpSD <- GLMImportanceTotal %>% group_by(names) %>% summarise_all(funs(sd(z.value)))
   GLMImportanceTotal <- ddply(GLMImportanceTotal, .(names), summarize,  MeanImportance=mean(z.value), SDImportance=sd(z.value))
   #GLMImportanceTotal <- left_join(tmpMean,tmpSD,by=c("names"))
   colnames(GLMImportanceTotal) <- c("Variable","MeanImportance","SDImportance")
@@ -333,8 +333,6 @@ for(species in speciesList){
   write.table(GLMEvaluationTotal,paste(species,"GLMEvaluation.txt",sep=""),quote=FALSE,sep="\t",row.names = TRUE)
   
   #Maxent summary statistics
-  #tmpMean <- XMImportanceTotal %>% group_by(variable) %>% summarise_all(funs(mean(permutation.importance)))
-  #tmpSD <- XMImportanceTotal %>% group_by(variable) %>% summarise_all(funs(sd(permutation.importance)))
   XMImportanceTotal <- ddply(XMImportanceTotal, .(variable), summarize,  MeanImportance=mean(permutation.importance), SDImportance=sd(permutation.importance))
   #XMImportanceTotal <- left_join(tmpMean,tmpSD,by=c("variable"))
   colnames(XMImportanceTotal) <- c("Variable","MeanImportance","SDImportance")
@@ -345,128 +343,6 @@ for(species in speciesList){
   XMEvaluationTotal <- as.data.frame(rbind(tmpMean,tmpSD))
   #To save aggregated data frame.
   write.table(XMEvaluationTotal,paste(species,"XMEvaluation.txt",sep=""),quote=FALSE,sep="\t",row.names = TRUE)
-  #Partial dependence plots for the random forest model
-  if(species=="Plover"){
-    RFp1Plot <- ggplot(RFp1Total, aes(x=DEM10mAligned,y=yhat))+theme(text = element_text(size=25))+geom_smooth(method=lm, formula = y ~ bs(x, degree = 2), aes(fill=yhat))
-    RFp1Plot <- RFp1Plot+xlab("Elevation (m)")+ylab("Detection\nProbability")
-    RFp2Plot <- ggplot(RFp2Total, aes(x=Freshwater10mAligned,y=yhat))+theme(text = element_text(size=25))+geom_smooth(method=lm, formula = y ~ bs(x, degree = 2), aes(fill=yhat))
-    RFp2Plot <- RFp2Plot+xlab("Distance to freshwater (m)")+ylab("Detection\nProbability")
-    RFp3Plot <- ggplot(RFp3Total, aes(x=Saltwater10mAligned,y=yhat))+theme(text = element_text(size=25))+geom_smooth(method=lm, formula = y ~ bs(x, degree = 2), aes(fill=yhat))
-    RFp3Plot <- RFp3Plot+xlab("Distance to saltwater (m)")+ylab("Detection\nProbability")
-    RFp4Plot <- ggplot(RFp4Total, aes(x=LogSI10mAligned,y=yhat))+theme(text = element_text(size=25))+geom_smooth(method=lm, formula = y ~ bs(x, degree = 2), aes(fill=yhat))
-    RFp4Plot <- RFp4Plot+xlab("Log(SI) log(mlx)")+ylab("Detection\nProbability")
-    RFp5Plot <- ggplot(RFp5Total, aes(x=Slope10mAligned,y=yhat))+theme(text = element_text(size=25))+geom_smooth(method=lm, formula = y ~ bs(x, degree = 2), aes(fill=yhat))
-    RFp5Plot <- RFp5Plot+xlab("Slope (%)")+ylab("Detection\nProbability")
-    RFp6Plot <- ggplot(RFp6Total, aes(x=SoCalBeachType10mAligned,y=yhat))+theme(text = element_text(size=25))+geom_boxplot(notch=FALSE)
-    RFp6Plot <- RFp6Plot+xlab("Beach category")+ylab("Detection\nProbability")
-    RFp7Plot <- ggplot(RFp7Total, aes(x=SoCalBeachWidth10mAligned,y=yhat))+theme(text = element_text(size=25))+geom_smooth(method=lm, formula = y ~ bs(x, degree = 2), aes(fill=yhat))
-    RFp7Plot <- RFp7Plot+xlab("Beach width (m)")+ylab("Detection\nProbability")
-    RFp8Plot <- ggplot(RFp8Total, aes(x=SVF10mAligned,y=yhat))+theme(text = element_text(size=25))+geom_smooth(method=lm, formula = y ~ bs(x, degree = 2), aes(fill=yhat))
-    RFp8Plot <- RFp8Plot+xlab("SVF")+ylab("Detection\nProbability")
-    RFPlots <- plot_grid(RFp1Plot,RFp2Plot,RFp3Plot,RFp4Plot,RFp5Plot,RFp6Plot,RFp7Plot,RFp8Plot,ncol=2,labels="AUTO")
-    
-  }
-  if(species=="Grunion"){
-    #RFp1Plot <- ggplot(RFp1Total, aes(x=DEM10mAligned,y=yhat))+theme(text = element_text(size=25))+geom_smooth(method=lm, formula = y ~ bs(x, degree = 2), aes(fill=yhat))
-    #RFp1Plot <- RFp1Plot+xlab("Elevation (m)")+ylab("Detection\nProbability")
-    RFp2Plot <- ggplot(RFp2Total, aes(x=Freshwater10mAligned,y=yhat))+theme(text = element_text(size=25))+geom_smooth(method=lm, formula = y ~ bs(x, degree = 2), aes(fill=yhat))
-    RFp2Plot <- RFp2Plot+xlab("Distance to freshwater (m)")+ylab("Detection\nProbability")
-    #RFp3Plot <- ggplot(RFp3Total, aes(x=Saltwater10mAligned,y=yhat))+theme(text = element_text(size=25))+geom_smooth(method=lm, formula = y ~ bs(x, degree = 2), aes(fill=yhat))
-    #RFp3Plot <- RFp3Plot+xlab("Distance to saltwater (m)")+ylab("Detection\nProbability")
-    RFp4Plot <- ggplot(RFp4Total, aes(x=LogSI10mAligned,y=yhat))+theme(text = element_text(size=25))+geom_smooth(method=lm, formula = y ~ bs(x, degree = 2), aes(fill=yhat))
-    RFp4Plot <- RFp4Plot+xlab("Log(SI) log(mlx)")+ylab("Detection\nProbability")
-    RFp5Plot <- ggplot(RFp5Total, aes(x=Slope10mAligned,y=yhat))+theme(text = element_text(size=25))+geom_smooth(method=lm, formula = y ~ bs(x, degree = 2), aes(fill=yhat))
-    RFp5Plot <- RFp5Plot+xlab("Slope (%)")+ylab("Detection\nProbability")
-    RFp6Plot <- ggplot(RFp6Total, aes(x=SoCalBeachType10mAligned,y=yhat))+theme(text = element_text(size=25))+geom_boxplot(notch=FALSE)
-    RFp6Plot <- RFp6Plot+xlab("Beach category")+ylab("Detection\nProbability")
-    RFp7Plot <- ggplot(RFp7Total, aes(x=SoCalBeachWidth10mAligned,y=yhat))+theme(text = element_text(size=25))+geom_smooth(method=lm, formula = y ~ bs(x, degree = 2), aes(fill=yhat))
-    RFp7Plot <- RFp7Plot+xlab("Beach width (m)")+ylab("Detection\nProbability")
-    RFp8Plot <- ggplot(RFp8Total, aes(x=SVF10mAligned,y=yhat))+theme(text = element_text(size=25))+geom_smooth(method=lm, formula = y ~ bs(x, degree = 2), aes(fill=yhat))
-    RFp8Plot <- RFp8Plot+xlab("SVF")+ylab("Detection\nProbability")
-    RFPlots <- plot_grid(RFp2Plot,RFp4Plot,RFp5Plot,RFp6Plot,RFp7Plot,RFp8Plot,ncol=2,labels="AUTO")
-  }
-  
-  #Partial dependence plots for the GLM model
-  if(species=="Plover"){
-    GLMp1Plot <- ggplot(GLMp1Total, aes(x=DEM10mAligned,y=exp(yhat)/(1+exp(yhat))))+theme(text = element_text(size=25))+geom_smooth(method=lm, formula = y ~ bs(x, degree = 2), aes(fill=yhat))
-    GLMp1Plot <- GLMp1Plot+xlab("Elevation (m)")+ylab("Detection\nProbability")
-    GLMp2Plot <- ggplot(GLMp2Total, aes(x=Freshwater10mAligned,y=exp(yhat)/(1+exp(yhat))))+theme(text = element_text(size=25))+geom_smooth(method=lm, formula = y ~ bs(x, degree = 2), aes(fill=yhat))
-    GLMp2Plot <- GLMp2Plot+xlab("Distance to freshwater (m)")+ylab("Detection\nProbability")
-    GLMp3Plot <- ggplot(GLMp3Total, aes(x=Saltwater10mAligned,y=exp(yhat)/(1+exp(yhat))))+theme(text = element_text(size=25))+geom_smooth(method=lm, formula = y ~ bs(x, degree = 2), aes(fill=yhat))
-    GLMp3Plot <- GLMp3Plot+xlab("Distance to saltwater (m)")+ylab("Detection\nProbability")
-    GLMp4Plot <- ggplot(GLMp4Total, aes(x=LogSI10mAligned,y=exp(yhat)/(1+exp(yhat))))+theme(text = element_text(size=25))+geom_smooth(method=lm, formula = y ~ bs(x, degree = 2), aes(fill=yhat))
-    GLMp4Plot <- GLMp4Plot+xlab("Log(SI) log(mlx)")+ylab("Detection\nProbability")
-    GLMp5Plot <- ggplot(GLMp5Total, aes(x=Slope10mAligned,y=exp(yhat)/(1+exp(yhat))))+theme(text = element_text(size=25))+geom_smooth(method=lm, formula = y ~ bs(x, degree = 2), aes(fill=yhat))
-    GLMp5Plot <- GLMp5Plot+xlab("Slope (%)")+ylab("Detection\nProbability")
-    GLMp6Plot <- ggplot(GLMp6Total, aes(x=SoCalBeachType10mAligned,y=exp(yhat)/(1+exp(yhat))))+theme(text = element_text(size=25))+geom_boxplot(notch=FALSE)
-    GLMp6Plot <- GLMp6Plot+xlab("Beach category")+ylab("Detection\nProbability")
-    GLMp7Plot <- ggplot(GLMp7Total, aes(x=SoCalBeachWidth10mAligned,y=exp(yhat)/(1+exp(yhat))))+theme(text = element_text(size=25))+geom_smooth(method=lm, formula = y ~ bs(x, degree = 2), aes(fill=yhat))
-    GLMp7Plot <- GLMp7Plot+xlab("Beach width (m)")+ylab("Detection\nProbability")
-    GLMp8Plot <- ggplot(GLMp8Total, aes(x=SVF10mAligned,y=exp(yhat)/(1+exp(yhat))))+theme(text = element_text(size=25))+geom_smooth(method=lm, formula = y ~ bs(x, degree = 2), aes(fill=yhat))
-    GLMp8Plot <- GLMp8Plot+xlab("SVF")+ylab("Detection\nProbability")
-    GLMPlots <- plot_grid(GLMp1Plot,GLMp2Plot,GLMp3Plot,GLMp4Plot,GLMp5Plot,GLMp6Plot,GLMp7Plot,GLMp8Plot,ncol=2,labels="AUTO")
-    
-  }
-  if(species=="Grunion"){
-    #GLMp1Plot <- ggplot(GLMp1Total, aes(x=DEM10mAligned,y=exp(yhat)/(1+exp(yhat))))+theme(text = element_text(size=25))+geom_smooth(method=lm, formula = y ~ bs(x, degree = 2), aes(fill=yhat))
-    #GLMp1Plot <- GLMp1Plot+xlab("Elevation (m)")+ylab("Detection\nProbability")
-    GLMp2Plot <- ggplot(GLMp2Total, aes(x=Freshwater10mAligned,y=exp(yhat)/(1+exp(yhat))))+theme(text = element_text(size=25))+geom_smooth(method=lm, formula = y ~ bs(x, degree = 2), aes(fill=yhat))
-    GLMp2Plot <- GLMp2Plot+xlab("Distance to freshwater (m)")+ylab("Detection\nProbability")
-    #GLMp3Plot <- ggplot(GLMp3Total, aes(x=Saltwater10mAligned,y=exp(yhat)/(1+exp(yhat))))+theme(text = element_text(size=25))+geom_smooth(method=lm, formula = y ~ bs(x, degree = 2), aes(fill=yhat))
-    #GLMp3Plot <- GLMp3Plot+xlab("Distance to saltwater (m)")+ylab("Detection\nProbability")
-    GLMp4Plot <- ggplot(GLMp4Total, aes(x=LogSI10mAligned,y=exp(yhat)/(1+exp(yhat))))+theme(text = element_text(size=25))+geom_smooth(method=lm, formula = y ~ bs(x, degree = 2), aes(fill=yhat))
-    GLMp4Plot <- GLMp4Plot+xlab("Log(SI) log(mlx)")+ylab("Detection\nProbability")
-    GLMp5Plot <- ggplot(GLMp5Total, aes(x=Slope10mAligned,y=exp(yhat)/(1+exp(yhat))))+theme(text = element_text(size=25))+geom_smooth(method=lm, formula = y ~ bs(x, degree = 2), aes(fill=yhat))
-    GLMp5Plot <- GLMp5Plot+xlab("Slope (%)")+ylab("Detection\nProbability")
-    GLMp6Plot <- ggplot(GLMp6Total, aes(x=SoCalBeachType10mAligned,y=exp(yhat)/(1+exp(yhat))))+theme(text = element_text(size=25))+geom_boxplot(notch=FALSE)
-    GLMp6Plot <- GLMp6Plot+xlab("Beach category")+ylab("Detection\nProbability")
-    GLMp7Plot <- ggplot(GLMp7Total, aes(x=SoCalBeachWidth10mAligned,y=exp(yhat)/(1+exp(yhat))))+theme(text = element_text(size=25))+geom_smooth(method=lm, formula = y ~ bs(x, degree = 2), aes(fill=yhat))
-    GLMp7Plot <- GLMp7Plot+xlab("Beach width (m)")+ylab("Detection\nProbability")
-    GLMp8Plot <- ggplot(GLMp8Total, aes(x=SVF10mAligned,y=exp(yhat)/(1+exp(yhat))))+theme(text = element_text(size=25))+geom_smooth(method=lm, formula = y ~ bs(x, degree = 2), aes(fill=yhat))
-    GLMp8Plot <- GLMp8Plot+xlab("SVF")+ylab("Detection\nProbability")
-    GLMPlots <- plot_grid(GLMp2Plot,GLMp4Plot,GLMp5Plot,GLMp6Plot,GLMp7Plot,GLMp8Plot,ncol=2,labels="AUTO")
-  }
-  
-  #Partial dependence plots for the Maxent model
-  if(species=="Plover"){
-    XMp1Plot <- ggplot(XMp1Total, aes(x=V1,y=p))+theme(text = element_text(size=25))+geom_smooth(method=lm, formula = y ~ bs(x, degree = 2), aes(fill=p))
-    XMp1Plot <- XMp1Plot+xlab("Elevation (m)")+ylab("Detection\nProbability")
-    XMp2Plot <- ggplot(XMp2Total, aes(x=V1,y=p))+theme(text = element_text(size=25))+geom_smooth(method=lm, formula = y ~ bs(x, degree = 2), aes(fill=p))
-    XMp2Plot <- XMp2Plot+xlab("Distance to freshwater (m)")+ylab("Detection\nProbability")
-    XMp3Plot <- ggplot(XMp3Total, aes(x=V1,y=p))+theme(text = element_text(size=25))+geom_smooth(method=lm, formula = y ~ bs(x, degree = 2), aes(fill=p))
-    XMp3Plot <- XMp3Plot+xlab("Distance to saltwater (m)")+ylab("Detection\nProbability")
-    XMp4Plot <- ggplot(XMp4Total, aes(x=V1,y=p))+theme(text = element_text(size=25))+geom_smooth(method=lm, formula = y ~ bs(x, degree = 2), aes(fill=p))
-    XMp4Plot <- XMp4Plot+xlab("Log(SI) log(mlx)")+ylab("Detection\nProbability")
-    XMp5Plot <- ggplot(XMp5Total, aes(x=V1,y=p))+theme(text = element_text(size=25))+geom_smooth(method=lm, formula = y ~ bs(x, degree = 2), aes(fill=p))
-    XMp5Plot <- XMp5Plot+xlab("Slope (%)")+ylab("Detection\nProbability")
-    XMp6Plot <- ggplot(XMp6Total, aes(x=as.factor(V1),y=p))+theme(text = element_text(size=25))+geom_boxplot(notch=FALSE)
-    XMp6Plot <- XMp6Plot+xlab("Beach category")+ylab("Detection\nProbability")
-    XMp7Plot <- ggplot(XMp7Total, aes(x=V1,y=p))+theme(text = element_text(size=25))+geom_smooth(method=lm, formula = y ~ bs(x, degree = 2), aes(fill=p))
-    XMp7Plot <- XMp7Plot+xlab("Beach width (m)")+ylab("Detection\nProbability")
-    XMp8Plot <- ggplot(XMp8Total, aes(x=V1,y=p))+theme(text = element_text(size=25))+geom_smooth(method=lm, formula = y ~ bs(x, degree = 2), aes(fill=p))
-    XMp8Plot <- XMp8Plot+xlab("SVF")+ylab("Detection\nProbability")
-    XMPlots <- plot_grid(XMp1Plot,XMp2Plot,XMp3Plot,XMp4Plot,XMp5Plot,XMp6Plot,XMp7Plot,XMp8Plot,ncol=2,labels="AUTO")
-    
-  }
-  if(species=="Grunion"){
-    #XMp1Plot <- ggplot(XMp1Total, aes(x=V1,y=p))+theme(text = element_text(size=25))+geom_smooth(method=lm, formula = y ~ bs(x, degree = 2), aes(fill=p))
-    #XMp1Plot <- XMp1Plot+xlab("Elevation (m)")+ylab("Detection\nProbability")
-    XMp2Plot <- ggplot(XMp2Total, aes(x=V1,y=p))+theme(text = element_text(size=25))+geom_smooth(method=lm, formula = y ~ bs(x, degree = 2), aes(fill=p))
-    XMp2Plot <- XMp2Plot+xlab("Distance to freshwater (m)")+ylab("Detection\nProbability")
-    #XMp3Plot <- ggplot(XMp3Total, aes(x=V1,y=p))+theme(text = element_text(size=25))+geom_smooth(method=lm, formula = y ~ bs(x, degree = 2), aes(fill=p))
-    #XMp3Plot <- XMp3Plot+xlab("Distance to saltwater (m)")+ylab("Detection\nProbability")
-    XMp4Plot <- ggplot(XMp4Total, aes(x=V1,y=p))+theme(text = element_text(size=25))+geom_smooth(method=lm, formula = y ~ bs(x, degree = 2), aes(fill=p))
-    XMp4Plot <- XMp4Plot+xlab("Log(SI) log(mlx)")+ylab("Detection\nProbability")
-    XMp5Plot <- ggplot(XMp5Total, aes(x=V1,y=p))+theme(text = element_text(size=25))+geom_smooth(method=lm, formula = y ~ bs(x, degree = 2), aes(fill=p))
-    XMp5Plot <- XMp5Plot+xlab("Slope (%)")+ylab("Detection\nProbability")
-    XMp6Plot <- ggplot(XMp6Total, aes(x=as.factor(V1),y=p))+theme(text = element_text(size=25))+geom_boxplot(notch=FALSE)
-    XMp6Plot <- XMp6Plot+xlab("Beach category")+ylab("Detection\nProbability")
-    XMp7Plot <- ggplot(XMp7Total, aes(x=V1,y=p))+theme(text = element_text(size=25))+geom_smooth(method=lm, formula = y ~ bs(x, degree = 2), aes(fill=p))
-    XMp7Plot <- XMp7Plot+xlab("Beach width (m)")+ylab("Detection\nProbability")
-    XMp8Plot <- ggplot(XMp8Total, aes(x=V1,y=p))+theme(text = element_text(size=25))+geom_smooth(method=lm, formula = y ~ bs(x, degree = 2), aes(fill=p))
-    XMp8Plot <- XMp8Plot+xlab("SVF")+ylab("Detection\nProbability")
-    XMPlots <- plot_grid(XMp2Plot,XMp4Plot,XMp5Plot,XMp6Plot,XMp7Plot,XMp8Plot,ncol=2,labels="AUTO")
-  }
   #To save all of the raw points used in the partial response plots for the generalized linear model.
   if(species=="Grunion"){
     #colnames(GLMp1Total)[which(names(GLMp1Total) == "yhat")] <- paste(colnames(GLMp1Total)[2],colnames(GLMp1Total)[1],sep="")
@@ -480,6 +356,18 @@ for(species in speciesList){
     GLMTotal <- bind_cols(GLMp2Total,GLMp4Total,GLMp5Total,GLMp7Total,GLMp8Total)
     write.table(GLMTotal,paste(species,"GLMPartialResponse.txt",sep=""),quote=FALSE,sep="\t",row.names = FALSE)
     write.table(GLMp6Total,paste(species,"GLMBeachCategoryResponse.txt",sep=""),quote=FALSE,sep="\t",row.names = FALSE)
+    #Create 2d histograms with best-fit splines for the partial response curves.
+    GLMTotal <- read.table(paste(species,"GLMPartialResponse.txt",sep=""), header=TRUE, sep="\t",as.is=T,skip=0,fill=TRUE,check.names=FALSE, encoding = "UTF-8")
+    GLMp6Total <- read.table(paste(species,"GLMBeachCategoryResponse.txt",sep=""), header=TRUE, sep="\t",as.is=T,skip=0,fill=TRUE,check.names=FALSE, encoding = "UTF-8")
+    #GLMp1Plot <- ggplot(GLMTotal, aes(x=DEM10mAligned, y=exp(yhatDEM10mAligned)/(1+exp(yhatDEM10mAligned))) )+xlab("Elevation (m)")+ylab("Detection\nProbability")+geom_bin2d(bins = 50)+scale_fill_continuous(type = "viridis")+stat_smooth(aes(y = exp(yhatDEM10mAligned)/(1+exp(yhatDEM10mAligned)), fill=exp(yhatDEM10mAligned)/(1+exp(yhatDEM10mAligned))),method="auto",formula=y~x,color="violet",fill="red",n=0.1*nrow(GLMTotal))+theme_bw(base_size=25)
+    GLMp2Plot <- ggplot(GLMTotal, aes(x=Freshwater10mAligned, y=exp(yhatFreshwater10mAligned)/(1+exp(yhatFreshwater10mAligned))) )+xlab("Distance to Freshwater (m)")+ylab("Detection\nProbability")+geom_bin2d(bins = 50)+scale_fill_continuous(type = "viridis")+stat_smooth(aes(y = exp(yhatFreshwater10mAligned)/(1+exp(yhatFreshwater10mAligned)), fill=exp(yhatFreshwater10mAligned)/(1+exp(yhatFreshwater10mAligned))),method="auto",formula=y~x,color="violet",fill="red",n=0.1*nrow(GLMTotal))+theme_bw(base_size=25)
+    #GLMp3Plot <- ggplot(GLMTotal, aes(x=Saltwater10mAligned, y=exp(yhatSaltwater10mAligned)/(1+exp(yhatSaltwater10mAligned))) )+xlab("Distance to Saltwater (m)")+ylab("Detection\nProbability")+geom_bin2d(bins = 50)+scale_fill_continuous(type = "viridis")+stat_smooth(aes(y = exp(yhatSaltwater10mAligned)/(1+exp(yhatSaltwater10mAligned)), fill=exp(yhatSaltwater10mAligned)/(1+exp(yhatSaltwater10mAligned))),method="auto",formula=y~x,color="violet",fill="red",n=0.1*nrow(GLMTotal))+theme_bw(base_size=25)
+    GLMp4Plot <- ggplot(GLMTotal, aes(x=LogSI10mAligned, y=exp(yhatLogSI10mAligned)/(1+exp(yhatLogSI10mAligned))) )+xlab("Log(SI) log(mlx)")+ylab("Detection\nProbability")+geom_bin2d(bins = 50)+scale_fill_continuous(type = "viridis")+stat_smooth(aes(y = exp(yhatLogSI10mAligned)/(1+exp(yhatLogSI10mAligned)), fill=exp(yhatLogSI10mAligned)/(1+exp(yhatLogSI10mAligned))),method="auto",formula=y~x,color="violet",fill="red",n=0.1*nrow(GLMTotal))+theme_bw(base_size=25)
+    GLMp5Plot <- ggplot(GLMTotal, aes(x=Slope10mAligned, y=exp(yhatSlope10mAligned)/(1+exp(yhatSlope10mAligned))) )+xlab("Slope (%)")+ylab("Detection\nProbability")+geom_bin2d(bins = 50)+scale_fill_continuous(type = "viridis")+stat_smooth(aes(y = exp(yhatSlope10mAligned)/(1+exp(yhatSlope10mAligned)), fill=exp(yhatSlope10mAligned)/(1+exp(yhatSlope10mAligned))),method="auto",formula=y~x,color="violet",fill="red",n=0.1*nrow(GLMTotal))+theme_bw(base_size=25)
+    GLMp6Plot <- ggplot(GLMp6Total, aes(x=as.factor(SoCalBeachType10mAligned),y=exp(yhatSoCalBeachType10mAligned)/(1+exp(yhatSoCalBeachType10mAligned))))+geom_boxplot(notch=FALSE)+xlab("Beach category")+ylab("Detection\nProbability")+theme_bw(base_size=25)
+    GLMp7Plot <- ggplot(GLMTotal, aes(x=SoCalBeachWidth10mAligned, y=exp(yhatSoCalBeachWidth10mAligned)/(1+exp(yhatSoCalBeachWidth10mAligned))) )+xlab("Beach width (m)")+ylab("Detection\nProbability")+geom_bin2d(bins = 50)+scale_fill_continuous(type = "viridis")+stat_smooth(aes(y = exp(yhatSoCalBeachWidth10mAligned)/(1+exp(yhatSoCalBeachWidth10mAligned)), fill=exp(yhatSoCalBeachWidth10mAligned)/(1+exp(yhatSoCalBeachWidth10mAligned))),method="auto",formula=y~x,color="violet",fill="red",n=0.1*nrow(GLMTotal))+theme_bw(base_size=25)
+    GLMp8Plot <- ggplot(GLMTotal, aes(x=SVF10mAligned, y=exp(yhatSVF10mAligned)/(1+exp(yhatSVF10mAligned))) )+xlab("SVF")+ylab("Detection\nProbability")+geom_bin2d(bins = 50)+scale_fill_continuous(type = "viridis")+stat_smooth(aes(y = exp(yhatSVF10mAligned)/(1+exp(yhatSVF10mAligned)), fill=exp(yhatSVF10mAligned)/(1+exp(yhatSVF10mAligned))),method="auto",formula=y~x,color="violet",fill="red",n=0.1*nrow(GLMTotal))+theme_bw(base_size=25)
+    GLMPlots <- plot_grid(GLMp2Plot,GLMp4Plot,GLMp5Plot,GLMp6Plot,GLMp7Plot,GLMp8Plot,ncol=2,labels="AUTO")
   }
   if(species=="Plover"){
     colnames(GLMp1Total)[which(names(GLMp1Total) == "yhat")] <- paste(colnames(GLMp1Total)[2],colnames(GLMp1Total)[1],sep="")
@@ -493,6 +381,18 @@ for(species in speciesList){
     GLMTotal <- bind_cols(GLMp1Total,GLMp2Total,GLMp3Total,GLMp4Total,GLMp5Total,GLMp7Total,GLMp8Total)
     write.table(GLMTotal,paste(species,"GLMPartialResponse.txt",sep=""),quote=FALSE,sep="\t",row.names = FALSE)
     write.table(GLMp6Total,paste(species,"GLMBeachCategoryResponse.txt",sep=""),quote=FALSE,sep="\t",row.names = FALSE)
+    #Create 2d histograms with best-fit splines for the partial response curves.
+    GLMTotal <- read.table(paste(species,"GLMPartialResponse.txt",sep=""), header=TRUE, sep="\t",as.is=T,skip=0,fill=TRUE,check.names=FALSE, encoding = "UTF-8")
+    GLMp6Total <- read.table(paste(species,"GLMBeachCategoryResponse.txt",sep=""), header=TRUE, sep="\t",as.is=T,skip=0,fill=TRUE,check.names=FALSE, encoding = "UTF-8")
+    GLMp1Plot <- ggplot(GLMTotal, aes(x=DEM10mAligned, y=exp(yhatDEM10mAligned)/(1+exp(yhatDEM10mAligned))) )+xlab("Elevation (m)")+ylab("Detection\nProbability")+geom_bin2d(bins = 50)+scale_fill_continuous(type = "viridis")+stat_smooth(aes(y = exp(yhatDEM10mAligned)/(1+exp(yhatDEM10mAligned)), fill=exp(yhatDEM10mAligned)/(1+exp(yhatDEM10mAligned))),method="auto",formula=y~x,color="violet",fill="red",n=0.1*nrow(GLMTotal))+theme_bw(base_size=25)
+    GLMp2Plot <- ggplot(GLMTotal, aes(x=Freshwater10mAligned, y=exp(yhatFreshwater10mAligned)/(1+exp(yhatFreshwater10mAligned))) )+xlab("Distance to Freshwater (m)")+ylab("Detection\nProbability")+geom_bin2d(bins = 50)+scale_fill_continuous(type = "viridis")+stat_smooth(aes(y = exp(yhatFreshwater10mAligned)/(1+exp(yhatFreshwater10mAligned)), fill=exp(yhatFreshwater10mAligned)/(1+exp(yhatFreshwater10mAligned))),method="auto",formula=y~x,color="violet",fill="red",n=0.1*nrow(GLMTotal))+theme_bw(base_size=25)
+    GLMp3Plot <- ggplot(GLMTotal, aes(x=Saltwater10mAligned, y=exp(yhatSaltwater10mAligned)/(1+exp(yhatSaltwater10mAligned))) )+xlab("Distance to Saltwater (m)")+ylab("Detection\nProbability")+geom_bin2d(bins = 50)+scale_fill_continuous(type = "viridis")+stat_smooth(aes(y = exp(yhatSaltwater10mAligned)/(1+exp(yhatSaltwater10mAligned)), fill=exp(yhatSaltwater10mAligned)/(1+exp(yhatSaltwater10mAligned))),method="auto",formula=y~x,color="violet",fill="red",n=0.1*nrow(GLMTotal))+theme_bw(base_size=25)
+    GLMp4Plot <- ggplot(GLMTotal, aes(x=LogSI10mAligned, y=exp(yhatLogSI10mAligned)/(1+exp(yhatLogSI10mAligned))) )+xlab("Log(SI) log(mlx)")+ylab("Detection\nProbability")+geom_bin2d(bins = 50)+scale_fill_continuous(type = "viridis")+stat_smooth(aes(y = exp(yhatLogSI10mAligned)/(1+exp(yhatLogSI10mAligned)), fill=exp(yhatLogSI10mAligned)/(1+exp(yhatLogSI10mAligned))),method="auto",formula=y~x,color="violet",fill="red",n=0.1*nrow(GLMTotal))+theme_bw(base_size=25)
+    GLMp5Plot <- ggplot(GLMTotal, aes(x=Slope10mAligned, y=exp(yhatSlope10mAligned)/(1+exp(yhatSlope10mAligned))) )+xlab("Slope (%)")+ylab("Detection\nProbability")+geom_bin2d(bins = 50)+scale_fill_continuous(type = "viridis")+stat_smooth(aes(y = exp(yhatSlope10mAligned)/(1+exp(yhatSlope10mAligned)), fill=exp(yhatSlope10mAligned)/(1+exp(yhatSlope10mAligned))),method="auto",formula=y~x,color="violet",fill="red",n=0.1*nrow(GLMTotal))+theme_bw(base_size=25)
+    GLMp6Plot <- ggplot(GLMp6Total, aes(x=as.factor(SoCalBeachType10mAligned),y=exp(yhatSoCalBeachType10mAligned)/(1+exp(yhatSoCalBeachType10mAligned))))+geom_boxplot(notch=FALSE)+xlab("Beach category")+ylab("Detection\nProbability")+theme_bw(base_size=25)
+    GLMp7Plot <- ggplot(GLMTotal, aes(x=SoCalBeachWidth10mAligned, y=exp(yhatSoCalBeachWidth10mAligned)/(1+exp(yhatSoCalBeachWidth10mAligned))) )+xlab("Beach width (m)")+ylab("Detection\nProbability")+geom_bin2d(bins = 50)+scale_fill_continuous(type = "viridis")+stat_smooth(aes(y = exp(yhatSoCalBeachWidth10mAligned)/(1+exp(yhatSoCalBeachWidth10mAligned)), fill=exp(yhatSoCalBeachWidth10mAligned)/(1+exp(yhatSoCalBeachWidth10mAligned))),method="auto",formula=y~x,color="violet",fill="red",n=0.1*nrow(GLMTotal))+theme_bw(base_size=25)
+    GLMp8Plot <- ggplot(GLMTotal, aes(x=SVF10mAligned, y=exp(yhatSVF10mAligned)/(1+exp(yhatSVF10mAligned))) )+xlab("SVF")+ylab("Detection\nProbability")+geom_bin2d(bins = 50)+scale_fill_continuous(type = "viridis")+stat_smooth(aes(y = exp(yhatSVF10mAligned)/(1+exp(yhatSVF10mAligned)), fill=exp(yhatSVF10mAligned)/(1+exp(yhatSVF10mAligned))),method="auto",formula=y~x,color="violet",fill="red",n=0.1*nrow(GLMTotal))+theme_bw(base_size=25)
+    GLMPlots <- plot_grid(GLMp1Plot,GLMp2Plot,GLMp3Plot,GLMp4Plot,GLMp5Plot,GLMp6Plot,GLMp7Plot,GLMp8Plot,ncol=2,labels="AUTO")
   }
   #To save all of the raw points used in the partial response plots for the generalized linear model.
   if(species=="Grunion"){
@@ -508,6 +408,18 @@ for(species in speciesList){
     print(colnames(XMTotal))
     write.table(XMTotal,paste(species,"XMPartialResponse.txt",sep=""),quote=FALSE,sep="\t",row.names = FALSE)
     write.table(XMp6Total,paste(species,"XMBeachCategoryResponse.txt",sep=""),quote=FALSE,sep="\t",row.names = FALSE)
+    #Create 2d histograms with best-fit splines for the partial response curves.
+    XMTotal <- read.table(paste(species,"XMPartialResponse.txt",sep=""), header=TRUE, sep="\t",as.is=T,skip=0,fill=TRUE,check.names=FALSE, encoding = "UTF-8")
+    XMp6Total <- read.table(paste(species,"XMBeachCategoryResponse.txt",sep=""), header=TRUE, sep="\t",as.is=T,skip=0,fill=TRUE,check.names=FALSE, encoding = "UTF-8")
+    #XMp1Plot <- ggplot(XMTotal, aes(x=Elevation, y=yElevation) )+xlab("Elevation (m)")+ylab("Detection\nProbability")+geom_bin2d(bins = 50)+scale_fill_continuous(type = "viridis")+stat_smooth(aes(y = yElevation, fill=yElevation),method="auto",formula=y~x,color="violet",fill="red",n=0.1*nrow(XMTotal))+theme_bw(base_size=25)
+    XMp2Plot <- ggplot(XMTotal, aes(x=DistanceToFreshwater, y=yDistanceToFreshwater) )+xlab("Distance to Freshwater (m)")+ylab("Detection\nProbability")+geom_bin2d(bins = 50)+scale_fill_continuous(type = "viridis")+stat_smooth(aes(y = yDistanceToFreshwater, fill=yDistanceToFreshwater),method="auto",formula=y~x,color="violet",fill="red",n=0.1*nrow(XMTotal))+theme_bw(base_size=25)
+    #XMp3Plot <- ggplot(XMTotal, aes(x=DistanceToSaltwater, y=yDistanceToSaltwater) )+xlab("Distance to Saltwater (m)")+ylab("Detection\nProbability")+geom_bin2d(bins = 50)+scale_fill_continuous(type = "viridis")+stat_smooth(aes(y = yDistanceToSaltwater, fill=yDistanceToSaltwater),method="auto",formula=y~x,color="violet",fill="red",n=0.1*nrow(XMTotal))+theme_bw(base_size=25)
+    XMp4Plot <- ggplot(XMTotal, aes(x=LogSI, y=yLogSI) )+xlab("Log(SI) log(mlx)")+ylab("Detection\nProbability")+geom_bin2d(bins = 50)+scale_fill_continuous(type = "viridis")+stat_smooth(aes(y = yLogSI, fill=yLogSI),method="auto",formula=y~x,color="violet",fill="red",n=0.1*nrow(XMTotal))+theme_bw(base_size=25)
+    XMp5Plot <- ggplot(XMTotal, aes(x=Slope, y=ySlope) )+xlab("Slope (%)")+ylab("Detection\nProbability")+geom_bin2d(bins = 50)+scale_fill_continuous(type = "viridis")+stat_smooth(aes(y = ySlope, fill=ySlope),method="auto",formula=y~x,color="violet",fill="red",n=0.1*nrow(XMTotal))+theme_bw(base_size=25)
+    XMp6Plot <- ggplot(XMp6Total, aes(x=as.factor(BeachType),y=yBeachType))+geom_boxplot(notch=FALSE)+xlab("Beach category")+ylab("Detection\nProbability")+theme_bw(base_size=25)
+    XMp7Plot <- ggplot(XMTotal, aes(x=BeachWidth, y=yBeachWidth) )+xlab("Beach width (m)")+ylab("Detection\nProbability")+geom_bin2d(bins = 50)+scale_fill_continuous(type = "viridis")+stat_smooth(aes(y = yBeachWidth, fill=yBeachWidth),method="auto",formula=y~x,color="violet",fill="red",n=0.1*nrow(XMTotal))+theme_bw(base_size=25)
+    XMp8Plot <- ggplot(XMTotal, aes(x=SVF, y=ySVF) )+xlab("SVF")+ylab("Detection\nProbability")+geom_bin2d(bins = 50)+scale_fill_continuous(type = "viridis")+stat_smooth(aes(y = ySVF, fill=ySVF),method="auto",formula=y~x,color="violet",fill="red",n=0.1*nrow(XMTotal))+theme_bw(base_size=25)
+    XMPlots <- plot_grid(XMp2Plot,XMp4Plot,XMp5Plot,XMp6Plot,XMp7Plot,XMp8Plot,ncol=2,labels="AUTO")
   }
   if(species=="Plover"){
     colnames(XMp1Total) <- c("Elevation","yElevation")
@@ -522,6 +434,18 @@ for(species in speciesList){
     print(colnames(XMTotal))
     write.table(XMTotal,paste(species,"XMPartialResponse.txt",sep=""),quote=FALSE,sep="\t",row.names = FALSE)
     write.table(XMp6Total,paste(species,"XMBeachCategoryResponse.txt",sep=""),quote=FALSE,sep="\t",row.names = FALSE)
+    #Create 2d histograms with best-fit splines for the partial response curves.
+    XMTotal <- read.table(paste(species,"XMPartialResponse.txt",sep=""), header=TRUE, sep="\t",as.is=T,skip=0,fill=TRUE,check.names=FALSE, encoding = "UTF-8")
+    XMp6Total <- read.table(paste(species,"XMBeachCategoryResponse.txt",sep=""), header=TRUE, sep="\t",as.is=T,skip=0,fill=TRUE,check.names=FALSE, encoding = "UTF-8")
+    XMp1Plot <- ggplot(XMTotal, aes(x=Elevation, y=yElevation) )+xlab("Elevation (m)")+ylab("Detection\nProbability")+geom_bin2d(bins = 50)+scale_fill_continuous(type = "viridis")+stat_smooth(aes(y = yElevation, fill=yElevation),method="auto",formula=y~x,color="violet",fill="red",n=0.1*nrow(XMTotal))+theme_bw(base_size=25)
+    XMp2Plot <- ggplot(XMTotal, aes(x=DistanceToFreshwater, y=yDistanceToFreshwater) )+xlab("Distance to Freshwater (m)")+ylab("Detection\nProbability")+geom_bin2d(bins = 50)+scale_fill_continuous(type = "viridis")+stat_smooth(aes(y = yDistanceToFreshwater, fill=yDistanceToFreshwater),method="auto",formula=y~x,color="violet",fill="red",n=0.1*nrow(XMTotal))+theme_bw(base_size=25)
+    XMp3Plot <- ggplot(XMTotal, aes(x=DistanceToSaltwater, y=yDistanceToSaltwater) )+xlab("Distance to Saltwater (m)")+ylab("Detection\nProbability")+geom_bin2d(bins = 50)+scale_fill_continuous(type = "viridis")+stat_smooth(aes(y = yDistanceToSaltwater, fill=yDistanceToSaltwater),method="auto",formula=y~x,color="violet",fill="red",n=0.1*nrow(XMTotal))+theme_bw(base_size=25)
+    XMp4Plot <- ggplot(XMTotal, aes(x=LogSI, y=yLogSI) )+xlab("Log(SI) log(mlx)")+ylab("Detection\nProbability")+geom_bin2d(bins = 50)+scale_fill_continuous(type = "viridis")+stat_smooth(aes(y = yLogSI, fill=yLogSI),method="auto",formula=y~x,color="violet",fill="red",n=0.1*nrow(XMTotal))+theme_bw(base_size=25)
+    XMp5Plot <- ggplot(XMTotal, aes(x=Slope, y=ySlope) )+xlab("Slope (%)")+ylab("Detection\nProbability")+geom_bin2d(bins = 50)+scale_fill_continuous(type = "viridis")+stat_smooth(aes(y = ySlope, fill=ySlope),method="auto",formula=y~x,color="violet",fill="red",n=0.1*nrow(XMTotal))+theme_bw(base_size=25)
+    XMp6Plot <- ggplot(XMp6Total, aes(x=as.factor(BeachType),y=yBeachType))+geom_boxplot(notch=FALSE)+xlab("Beach category")+ylab("Detection\nProbability")+theme_bw(base_size=25)
+    XMp7Plot <- ggplot(XMTotal, aes(x=BeachWidth, y=yBeachWidth) )+xlab("Beach width (m)")+ylab("Detection\nProbability")+geom_bin2d(bins = 50)+scale_fill_continuous(type = "viridis")+stat_smooth(aes(y = yBeachWidth, fill=yBeachWidth),method="auto",formula=y~x,color="violet",fill="red",n=0.1*nrow(XMTotal))+theme_bw(base_size=25)
+    XMp8Plot <- ggplot(XMTotal, aes(x=SVF, y=ySVF) )+xlab("SVF")+ylab("Detection\nProbability")+geom_bin2d(bins = 50)+scale_fill_continuous(type = "viridis")+stat_smooth(aes(y = ySVF, fill=ySVF),method="auto",formula=y~x,color="violet",fill="red",n=0.1*nrow(XMTotal))+theme_bw(base_size=25)
+    XMPlots <- plot_grid(XMp1Plot,XMp2Plot,XMp3Plot,XMp4Plot,XMp5Plot,XMp6Plot,XMp7Plot,XMp8Plot,ncol=2,labels="AUTO")
   }
   #To save all of the raw points used in the partial response plots for the random forest model.
   if(species=="Grunion"){
@@ -536,6 +460,18 @@ for(species in speciesList){
     RFTotal <- bind_cols(RFp2Total,RFp4Total,RFp5Total,RFp7Total,RFp8Total)
     write.table(RFTotal,paste(species,"RFPartialResponse.txt",sep=""),quote=FALSE,sep="\t",row.names = FALSE)
     write.table(RFp6Total,paste(species,"RFBeachCategoryResponse.txt",sep=""),quote=FALSE,sep="\t",row.names = FALSE)
+    #Create 2d histograms with best-fit splines for the partial response curves.
+    RFTotal <- read.table(paste(species,"RFPartialResponse.txt",sep=""), header=TRUE, sep="\t",as.is=T,skip=0,fill=TRUE,check.names=FALSE, encoding = "UTF-8")
+    RFp6Total <- read.table(paste(species,"RFBeachCategoryResponse.txt",sep=""), header=TRUE, sep="\t",as.is=T,skip=0,fill=TRUE,check.names=FALSE, encoding = "UTF-8")
+    #RFp1Plot <- ggplot(RFTotal, aes(x=DEM10mAligned, y=yhatDEM10mAligned) )+xlab("Elevation (m)")+ylab("Detection\nProbability")+geom_bin2d(bins = 50)+scale_fill_continuous(type = "viridis")+stat_smooth(aes(y = yhatDEM10mAligned, fill=yhatDEM10mAligned),method="auto",formula=y~x,color="violet",fill="red",n=0.1*nrow(RFTotal))+theme_bw(base_size=25)
+    RFp2Plot <- ggplot(RFTotal, aes(x=Freshwater10mAligned, y=yhatFreshwater10mAligned) )+xlab("Distance to Freshwater (m)")+ylab("Detection\nProbability")+geom_bin2d(bins = 50)+scale_fill_continuous(type = "viridis")+stat_smooth(aes(y = yhatFreshwater10mAligned, fill=yhatFreshwater10mAligned),method="auto",formula=y~x,color="violet",fill="red",n=0.1*nrow(RFTotal))+theme_bw(base_size=25)
+    #RFp3Plot <- ggplot(RFTotal, aes(x=Saltwater10mAligned, y=yhatSaltwater10mAligned) )+xlab("Distance to Saltwater (m)")+ylab("Detection\nProbability")+geom_bin2d(bins = 50)+scale_fill_continuous(type = "viridis")+stat_smooth(aes(y = yhatSaltwater10mAligned, fill=yhatSaltwater10mAligned),method="auto",formula=y~x,color="violet",fill="red",n=0.1*nrow(RFTotal))+theme_bw(base_size=25)
+    RFp4Plot <- ggplot(RFTotal, aes(x=LogSI10mAligned, y=yhatLogSI10mAligned) )+xlab("Log(SI) log(mlx)")+ylab("Detection\nProbability")+geom_bin2d(bins = 50)+scale_fill_continuous(type = "viridis")+stat_smooth(aes(y = yhatLogSI10mAligned, fill=yhatLogSI10mAligned),method="auto",formula=y~x,color="violet",fill="red",n=0.1*nrow(RFTotal))+theme_bw(base_size=25)
+    RFp5Plot <- ggplot(RFTotal, aes(x=Slope10mAligned, y=yhatSlope10mAligned) )+xlab("Slope (%)")+ylab("Detection\nProbability")+geom_bin2d(bins = 50)+scale_fill_continuous(type = "viridis")+stat_smooth(aes(y = yhatSlope10mAligned, fill=yhatSlope10mAligned),method="auto",formula=y~x,color="violet",fill="red",n=0.1*nrow(RFTotal))+theme_bw(base_size=25)
+    RFp6Plot <- ggplot(RFp6Total, aes(x=as.factor(SoCalBeachType10mAligned),y=yhatSoCalBeachType10mAligned))+geom_boxplot(notch=FALSE)+xlab("Beach category")+ylab("Detection\nProbability")+theme_bw(base_size=25)
+    RFp7Plot <- ggplot(RFTotal, aes(x=SoCalBeachWidth10mAligned, y=yhatSoCalBeachWidth10mAligned) )+xlab("Beach width (m)")+ylab("Detection\nProbability")+geom_bin2d(bins = 50)+scale_fill_continuous(type = "viridis")+stat_smooth(aes(y = yhatSoCalBeachWidth10mAligned, fill=yhatSoCalBeachWidth10mAligned),method="auto",formula=y~x,color="violet",fill="red",n=0.1*nrow(RFTotal))+theme_bw(base_size=25)
+    RFp8Plot <- ggplot(RFTotal, aes(x=SVF10mAligned, y=yhatSVF10mAligned) )+xlab("SVF")+ylab("Detection\nProbability")+geom_bin2d(bins = 50)+scale_fill_continuous(type = "viridis")+stat_smooth(aes(y = yhatSVF10mAligned, fill=yhatSVF10mAligned),method="auto",formula=y~x,color="violet",fill="red",n=0.1*nrow(RFTotal))+theme_bw(base_size=25)
+    RFPlots <- plot_grid(RFp2Plot,RFp4Plot,RFp5Plot,RFp6Plot,RFp7Plot,RFp8Plot,ncol=2,labels="AUTO")
   }
   if(species=="Plover"){
     colnames(RFp1Total)[which(names(RFp1Total) == "yhat")] <- paste(colnames(RFp1Total)[2],colnames(RFp1Total)[1],sep="")
@@ -549,16 +485,28 @@ for(species in speciesList){
     RFTotal <- bind_cols(RFp1Total,RFp2Total,RFp3Total,RFp4Total,RFp5Total,RFp7Total,RFp8Total)
     write.table(RFTotal,paste(species,"RFPartialResponse.txt",sep=""),quote=FALSE,sep="\t",row.names = FALSE)
     write.table(RFp6Total,paste(species,"RFBeachCategoryResponse.txt",sep=""),quote=FALSE,sep="\t",row.names = FALSE)
+    #Create 2d histograms with best-fit splines for the partial response curves.
+    RFTotal <- read.table(paste(species,"RFPartialResponse.txt",sep=""), header=TRUE, sep="\t",as.is=T,skip=0,fill=TRUE,check.names=FALSE, encoding = "UTF-8")
+    RFp6Total <- read.table(paste(species,"RFBeachCategoryResponse.txt",sep=""), header=TRUE, sep="\t",as.is=T,skip=0,fill=TRUE,check.names=FALSE, encoding = "UTF-8")
+    RFp1Plot <- ggplot(RFTotal, aes(x=DEM10mAligned, y=yhatDEM10mAligned) )+xlab("Elevation (m)")+ylab("Detection\nProbability")+geom_bin2d(bins = 50)+scale_fill_continuous(type = "viridis")+stat_smooth(aes(y = yhatDEM10mAligned, fill=yhatDEM10mAligned),method="auto",formula=y~x,color="violet",fill="red",n=0.1*nrow(RFTotal))+theme_bw(base_size=25)
+    RFp2Plot <- ggplot(RFTotal, aes(x=Freshwater10mAligned, y=yhatFreshwater10mAligned) )+xlab("Distance to Freshwater (m)")+ylab("Detection\nProbability")+geom_bin2d(bins = 50)+scale_fill_continuous(type = "viridis")+stat_smooth(aes(y = yhatFreshwater10mAligned, fill=yhatFreshwater10mAligned),method="auto",formula=y~x,color="violet",fill="red",n=0.1*nrow(RFTotal))+theme_bw(base_size=25)
+    RFp3Plot <- ggplot(RFTotal, aes(x=Saltwater10mAligned, y=yhatSaltwater10mAligned) )+xlab("Distance to Saltwater (m)")+ylab("Detection\nProbability")+geom_bin2d(bins = 50)+scale_fill_continuous(type = "viridis")+stat_smooth(aes(y = yhatSaltwater10mAligned, fill=yhatSaltwater10mAligned),method="auto",formula=y~x,color="violet",fill="red",n=0.1*nrow(RFTotal))+theme_bw(base_size=25)
+    RFp4Plot <- ggplot(RFTotal, aes(x=LogSI10mAligned, y=yhatLogSI10mAligned) )+xlab("Log(SI) log(mlx)")+ylab("Detection\nProbability")+geom_bin2d(bins = 50)+scale_fill_continuous(type = "viridis")+stat_smooth(aes(y = yhatLogSI10mAligned, fill=yhatLogSI10mAligned),method="auto",formula=y~x,color="violet",fill="red",n=0.1*nrow(RFTotal))+theme_bw(base_size=25)
+    RFp5Plot <- ggplot(RFTotal, aes(x=Slope10mAligned, y=yhatSlope10mAligned) )+xlab("Slope (%)")+ylab("Detection\nProbability")+geom_bin2d(bins = 50)+scale_fill_continuous(type = "viridis")+stat_smooth(aes(y = yhatSlope10mAligned, fill=yhatSlope10mAligned),method="auto",formula=y~x,color="violet",fill="red",n=0.1*nrow(RFTotal))+theme_bw(base_size=25)
+    RFp6Plot <- ggplot(RFp6Total, aes(x=as.factor(SoCalBeachType10mAligned),y=yhatSoCalBeachType10mAligned))+geom_boxplot(notch=FALSE)+xlab("Beach category")+ylab("Detection\nProbability")+theme_bw(base_size=25)
+    RFp7Plot <- ggplot(RFTotal, aes(x=SoCalBeachWidth10mAligned, y=yhatSoCalBeachWidth10mAligned) )+xlab("Beach width (m)")+ylab("Detection\nProbability")+geom_bin2d(bins = 50)+scale_fill_continuous(type = "viridis")+stat_smooth(aes(y = yhatSoCalBeachWidth10mAligned, fill=yhatSoCalBeachWidth10mAligned),method="auto",formula=y~x,color="violet",fill="red",n=0.1*nrow(RFTotal))+theme_bw(base_size=25)
+    RFp8Plot <- ggplot(RFTotal, aes(x=SVF10mAligned, y=yhatSVF10mAligned) )+xlab("SVF")+ylab("Detection\nProbability")+geom_bin2d(bins = 50)+scale_fill_continuous(type = "viridis")+stat_smooth(aes(y = yhatSVF10mAligned, fill=yhatSVF10mAligned),method="auto",formula=y~x,color="violet",fill="red",n=0.1*nrow(RFTotal))+theme_bw(base_size=25)
+    RFPlots <- plot_grid(RFp1Plot,RFp2Plot,RFp3Plot,RFp4Plot,RFp5Plot,RFp6Plot,RFp7Plot,RFp8Plot,ncol=2,labels="AUTO")
   }
-  png(paste(species,"GLMPlots.png",sep=""),width=2*400,height=200*length(env.files))
+  png(paste(species,"GLMPlots.png",sep=""),width=2*800,height=400*length(env.files))
   GLMPlots
   print(GLMPlots)
   dev.off()
-  png(paste(species,"XMPlots.png",sep=""),width=2*400,height=200*length(env.files))
+  png(paste(species,"XMPlots.png",sep=""),width=2*800,height=400*length(env.files))
   XMPlots
   print(XMPlots)
   dev.off()
-  png(paste(species,"RFPlots.png",sep=""),width=2*400,height=200*length(env.files))
+  png(paste(species,"RFPlots.png",sep=""),width=2*800,height=400*length(env.files))
   RFPlots
   print(RFPlots)
   dev.off()
