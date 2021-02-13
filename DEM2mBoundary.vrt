@@ -1,0 +1,20 @@
+<VRTDataset rasterXSize="95433" rasterYSize="61212">
+  <SRS>PROJCS["NAD83(2011) / California zone 5",GEOGCS["NAD83(2011)",DATUM["NAD83_National_Spatial_Reference_System_2011",SPHEROID["GRS 1980",6378137,298.257222101,AUTHORITY["EPSG","7019"]],AUTHORITY["EPSG","1116"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","6318"]],PROJECTION["Lambert_Conformal_Conic_2SP"],PARAMETER["standard_parallel_1",35.46666666666667],PARAMETER["standard_parallel_2",34.03333333333333],PARAMETER["latitude_of_origin",33.5],PARAMETER["central_meridian",-118],PARAMETER["false_easting",2000000],PARAMETER["false_northing",500000],UNIT["metre",1,AUTHORITY["EPSG","9001"]],AXIS["X",EAST],AXIS["Y",NORTH],AUTHORITY["EPSG","6423"]]</SRS>
+  <GeoTransform>  1.8578724794513560e+06,  2.0000000000000000e+00,  0.0000000000000000e+00,  6.0063190033016354e+05,  0.0000000000000000e+00, -2.0000000000000000e+00</GeoTransform>
+  <Metadata>
+    <MDI key="AREA_OR_POINT">Area</MDI>
+  </Metadata>
+  <Metadata domain="IMAGE_STRUCTURE">
+    <MDI key="INTERLEAVE">BAND</MDI>
+  </Metadata>
+  <VRTRasterBand dataType="Byte" band="1">
+    <NoDataValue>0</NoDataValue>
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">tempBoundary.vrt</SourceFilename>
+      <SourceBand>1</SourceBand>
+      <SourceProperties RasterXSize="95433" RasterYSize="61212" DataType="Byte" BlockXSize="128" BlockYSize="128" />
+      <SrcRect xOff="0" yOff="0" xSize="95433" ySize="61212" />
+      <DstRect xOff="0" yOff="0" xSize="95433" ySize="61212" />
+    </SimpleSource>
+  </VRTRasterBand>
+</VRTDataset>
